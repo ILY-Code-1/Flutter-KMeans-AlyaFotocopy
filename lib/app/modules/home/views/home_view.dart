@@ -159,7 +159,8 @@ class HomeView extends GetView<HomeController> {
         );
       },
       child: Center(
-        child: PlaceholderImage(
+        child: Image.asset(
+          'assets/images/hero_kmeans.png',
           width: Responsive.value(
             context,
             mobile: 280,
@@ -172,8 +173,7 @@ class HomeView extends GetView<HomeController> {
             tablet: 220,
             desktop: 240,
           ),
-          label: 'Ilustrasi Hero\n(300 x 220)',
-          icon: Icons.analytics_outlined,
+          fit: BoxFit.contain,
         ),
       ),
     );
@@ -206,12 +206,25 @@ class HomeView extends GetView<HomeController> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: PlaceholderImage(
+          child: Container(
             width: 280,
             height: 200,
-            label: 'Ilustrasi K-Means\n(280 x 200)',
-            icon: Icons.hub_outlined,
-            backgroundColor: Colors.white,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Image.asset(
+              'assets/images/illustration_kmeans.png',
+              fit: BoxFit.contain,
+            ),
           ),
         ),
         Gap.wXl,
@@ -226,12 +239,25 @@ class HomeView extends GetView<HomeController> {
   Widget _buildAboutMobileLayout(BuildContext context) {
     return Column(
       children: [
-        PlaceholderImage(
+        Container(
           width: 200,
           height: 150,
-          label: 'Ilustrasi K-Means\n(200 x 150)',
-          icon: Icons.hub_outlined,
-          backgroundColor: Colors.white,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Image.asset(
+            'assets/images/illustration_kmeans.png',
+            fit: BoxFit.contain,
+          ),
         ),
         Gap.hLg,
         _buildAboutContent(context),
@@ -352,7 +378,7 @@ class HomeView extends GetView<HomeController> {
       _GuideStepData(
         number: 3,
         title: 'Isi Nama & Email',
-        description: 'Lengkapi informasi nama dan email untuk menerima hasil analisis.',
+        description: 'Lengkapi informasi nama dan email untuk menerima hasil analisis via email.',
         icon: Icons.person_add_outlined,
         color: AppColors.softPurple,
       ),

@@ -64,7 +64,7 @@ class SuccessView extends StatelessWidget {
                   ),
                   Gap.hMd,
                   Text(
-                    'Data Anda telah berhasil dikirim.\nHasil analisis akan segera tersedia.',
+                    'Data anda berhasil dikirim.\nHasil analisis akan kami kirim via email.\nTerimakasih, happy analysis🙏',
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),

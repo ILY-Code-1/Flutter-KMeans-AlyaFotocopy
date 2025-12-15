@@ -39,7 +39,9 @@ class UserFormController extends GetxController {
 
     isLoading.value = true;
 
-    // Simulate API call
+    // generate pdf
+    // send via email
+
     Future.delayed(const Duration(seconds: 1), () {
       isLoading.value = false;
       Get.toNamed('/success');

@@ -25,6 +25,11 @@ class KMeansView extends GetView<KMeansController> {
                 _buildFormSection(context),
                 Gap.hXl,
                 _buildDataList(context),
+                Gap.hXl,
+                Align(
+                  alignment: Alignment.center,
+                  child: _buildSubmitButton(context),
+                ),
               ],
             ),
           ),
@@ -64,7 +69,10 @@ class KMeansView extends GetView<KMeansController> {
             Gap.hLg,
             _buildFormFields(context),
             Gap.hLg,
-            _buildFormButtons(context),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _buildFormButtons(context),
+            ),
           ],
         ),
       ),
@@ -74,10 +82,32 @@ class KMeansView extends GetView<KMeansController> {
   Widget _buildFormFields(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
 
+    void hitungDayToStockOut() {
+      final stokAkhir = double.tryParse(controller.stokAkhirController.text) ?? 0;
+      final rataRataBulanan = double.tryParse(controller.rataRataPemakaianController.text) ?? 0;
+      if (stokAkhir > 0 && rataRataBulanan > 0) {
+        final pemakaianPerHari = rataRataBulanan / 30;
+        final estimasiHari = stokAkhir / pemakaianPerHari;
+        controller.dayToStockOutController.text = estimasiHari.toStringAsFixed(2);
+      } else {
+        controller.dayToStockOutController.text = "0.00";
+      }
+    }
+
+    void hitungFluktuasi() {
+      final rataRataBulanan = double.tryParse(controller.rataRataPemakaianController.text) ?? 0;
+      if (rataRataBulanan > 0) {
+        final std = 0.2 * rataRataBulanan;
+        controller.fluktuasiPemakaianController.text = std.toStringAsFixed(2);
+      } else {
+        controller.fluktuasiPemakaianController.text = "0.00";
+      }
+    }
+
     final fields = [
       CustomInput(
         label: 'Nama Barang',
-        hint: 'Masukkan nama barang',
+        hint: 'Kertas A4',
         controller: controller.namaBarangController,
         validator: controller.validateRequired,
         prefixIcon: const Icon(Icons.inventory_2_outlined),
@@ -85,75 +115,84 @@ class KMeansView extends GetView<KMeansController> {
       ),
       CustomInput(
         label: 'Stok Awal',
-        hint: '0',
+        hint: '5',
         controller: controller.stokAwalController,
         validator: controller.validateNumber,
         keyboardType: TextInputType.number,
         prefixIcon: const Icon(Icons.inventory_outlined),
-        infoTooltip: 'Jumlah stok di awal periode',
+        infoTooltip: 'Jumlah stok di awal periode (unit)',
       ),
       CustomInput(
         label: 'Stok Akhir',
-        hint: '0',
+        hint: '2',
         controller: controller.stokAkhirController,
         validator: controller.validateNumber,
         keyboardType: TextInputType.number,
         prefixIcon: const Icon(Icons.inventory),
-        infoTooltip: 'Jumlah stok di akhir periode',
+        infoTooltip: 'Jumlah stok di akhir periode (unit)',
+        onChanged: (_) {
+          hitungDayToStockOut();
+        },
       ),
       CustomInput(
-        label: 'Jumlah Masuk',
-        hint: '0',
+        label: 'Jumlah Barang Masuk',
+        hint: '7',
         controller: controller.jumlahMasukController,
         validator: controller.validateNumber,
         keyboardType: TextInputType.number,
         prefixIcon: const Icon(Icons.add_box_outlined),
-        infoTooltip: 'Total barang yang masuk selama periode',
+        infoTooltip: 'Total barang yang masuk/terbeli selama periode (unit)',
       ),
       CustomInput(
-        label: 'Jumlah Keluar',
-        hint: '0',
+        label: 'Jumlah Barang Keluar',
+        hint: '10',
         controller: controller.jumlahKeluarController,
         validator: controller.validateNumber,
         keyboardType: TextInputType.number,
         prefixIcon: const Icon(Icons.outbox_outlined),
-        infoTooltip: 'Total barang yang keluar/terjual selama periode',
+        infoTooltip: 'Total barang yang keluar/terjual selama periode (unit)',
       ),
       CustomInput(
         label: 'Rata-Rata Pemakaian Bulanan',
-        hint: '0.00',
+        hint: '0.83',
         controller: controller.rataRataPemakaianController,
         validator: controller.validateNumber,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon: const Icon(Icons.trending_flat),
-        infoTooltip: 'Rata-rata jumlah pemakaian per bulan',
+        infoTooltip: 'Rata-rata jumlah (unit) pemakaian per bulan',
+        onChanged: (_) {
+          hitungDayToStockOut();
+          hitungFluktuasi();
+        },
       ),
       CustomInput(
-        label: 'Frekuensi Restock',
-        hint: '0',
+        label: 'Frekuensi Pembaruan Stok',
+        hint: '1',
         controller: controller.frekuensiRestockController,
         validator: controller.validateNumber,
         keyboardType: TextInputType.number,
         prefixIcon: const Icon(Icons.replay),
-        infoTooltip: 'Berapa kali barang di-restock dalam periode',
+        infoTooltip: 'Berapa kali barang diisi ulang dalam satu periode',
       ),
       CustomInput(
-        label: 'Day To Stock Out',
-        hint: '0.0',
+        label: 'Hari Perkiraan Stok Habis (otomatis)',
+        hint: '74.07',
         controller: controller.dayToStockOutController,
         validator: controller.validateNumber,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon: const Icon(Icons.schedule),
-        infoTooltip: 'Estimasi hari hingga stok habis',
+        infoTooltip: 'Estimasi berapa hari hingga stok habis -> stok_akhir / (rata_rata_pemakaian_bulanan / 30)',
+        enabled: false,
       ),
       CustomInput(
-        label: 'Fluktuasi Pemakaian Bulanan',
-        hint: '0.00',
+        label: 'Fluktuasi Pemakaian Bulanan (otomatis)',
+        hint: '0.16',
         controller: controller.fluktuasiPemakaianController,
         validator: controller.validateNumber,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon: const Icon(Icons.show_chart),
-        infoTooltip: 'Standar deviasi pemakaian bulanan',
+        infoTooltip: 'Standar deviasi pemakaian bulanan -> 0.2 x rata_rata_pemakaian_bulanan',
+        enabled: false,
       ),
     ];
 
@@ -195,7 +234,7 @@ class KMeansView extends GetView<KMeansController> {
       runSpacing: AppSpacing.sm,
       children: [
         Obx(() => PrimaryButton(
-              text: controller.isEditing.value ? 'Update' : 'Tambah',
+              text: controller.isEditing.value ? 'Perbarui' : 'Tambah',
               icon: controller.isEditing.value ? Icons.save : Icons.add,
               onPressed: controller.addOrUpdateItem,
             )),
@@ -206,13 +245,12 @@ class KMeansView extends GetView<KMeansController> {
                 icon: Icons.close,
                 onPressed: controller.clearForm,
               )
-            : const SizedBox.shrink()),
-        PrimaryButton(
-          text: 'Lanjutkan',
-          icon: Icons.arrow_forward,
-          backgroundColor: AppColors.secondary,
-          onPressed: controller.navigateToForm,
-        ),
+            : PrimaryButton(
+                text: 'Bersihkan',
+                isOutlined: true,
+                icon: Icons.cleaning_services,
+                onPressed: controller.clearForm,
+              )),
       ],
     );
   }
@@ -271,7 +309,7 @@ class KMeansView extends GetView<KMeansController> {
               return DataListTile(
                 index: index,
                 title: item.namaBarang,
-                subtitle: 'Stok: ${item.stokAwal.toStringAsFixed(0)} → ${item.stokAkhir.toStringAsFixed(0)}',
+                subtitle: 'Stok Awal dan Akhir: ${item.stokAwal.toStringAsFixed(0)} → ${item.stokAkhir.toStringAsFixed(0)}',
                 data: item.toDisplayMap(),
                 onEdit: () => controller.editItem(item),
                 onDelete: () => controller.deleteItem(item.id),
@@ -279,6 +317,20 @@ class KMeansView extends GetView<KMeansController> {
             },
           );
         }),
+      ],
+    );
+  }
+
+  Widget _buildSubmitButton(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        PrimaryButton(
+          text: 'Mulai Clustering',
+          icon: Icons.hub,
+          backgroundColor: AppColors.secondary,
+          onPressed: controller.navigateToForm,
+        ),
       ],
     );
   }

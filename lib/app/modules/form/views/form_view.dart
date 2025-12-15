@@ -29,24 +29,29 @@ class FormView extends GetView<UserFormController> {
   }
 
   Widget _buildDesktopLayout(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 3,
-          child: _buildFormCard(context),
-        ),
-        Gap.wXl,
-        Expanded(
-          flex: 2,
-          child: _buildIllustration(context),
-        ),
-      ],
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 3,
+            child: _buildFormCard(context),
+          ),
+          Gap.wXl,
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: _buildIllustration(context),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildMobileLayout(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildIllustration(context),
         Gap.hLg,
@@ -98,7 +103,7 @@ class FormView extends GetView<UserFormController> {
               Gap.hLg,
               CustomInput(
                 label: 'Nama Lengkap',
-                hint: 'Masukkan nama lengkap Anda',
+                hint: 'Alya', // SAMPE SINI YUSNAR!!!
                 controller: controller.namaController,
                 validator: controller.validateNama,
                 prefixIcon: const Icon(Icons.person_outline),
@@ -143,12 +148,35 @@ class FormView extends GetView<UserFormController> {
         );
       },
       child: Center(
-        child: PlaceholderImage(
-          width: 200,
-          height: 120,
-          label: 'Ilustrasi Form\n(200 x 120)',
-          icon: Icons.how_to_reg_outlined,
-          backgroundColor: AppColors.softGreen,
+        child: Container(
+          width: Responsive.value(
+            context,
+            mobile: 240,
+            tablet: 320,
+            desktop: 380,
+          ),
+          height: Responsive.value(
+            context,
+            mobile: 160,
+            tablet: 220,
+            desktop: 260,
+          ),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.softBlue,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 10,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Image.asset(
+            'assets/images/illustration_form.jpg',
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

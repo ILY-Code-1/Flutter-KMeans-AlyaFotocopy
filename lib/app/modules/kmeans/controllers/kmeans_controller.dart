@@ -155,16 +155,20 @@ class KMeansController extends GetxController {
   }
 
   void navigateToForm() {
-    if (items.isEmpty) {
+    if (items.length < 3) {
       Get.snackbar(
         'Peringatan',
-        'Tambahkan minimal 1 item data terlebih dahulu',
+        'Tambahkan minimal 3 item data terlebih dahulu',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.orange.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
       return;
     }
+
+    // k-means clustering
+    // save to firebase
+
     Get.toNamed('/form');
   }
 

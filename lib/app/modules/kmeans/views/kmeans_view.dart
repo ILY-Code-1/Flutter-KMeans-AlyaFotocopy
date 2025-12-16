@@ -325,12 +325,13 @@ class KMeansView extends GetView<KMeansController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        PrimaryButton(
-          text: 'Mulai Clustering',
-          icon: Icons.hub,
-          backgroundColor: AppColors.secondary,
-          onPressed: controller.navigateToForm,
-        ),
+        Obx(() => PrimaryButton(
+              text: 'Mulai Clustering',
+              icon: Icons.hub,
+              backgroundColor: AppColors.secondary,
+              isLoading: controller.isProcessing.value,
+              onPressed: controller.isProcessing.value ? null : controller.navigateToForm,
+            )),
       ],
     );
   }

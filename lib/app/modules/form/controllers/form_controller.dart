@@ -7,6 +7,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class UserFormController extends GetxController {
   final namaController = TextEditingController();
@@ -82,9 +83,16 @@ class UserFormController extends GetxController {
       // Download PDF
       await _downloadPdf(pdfBytes);
 
+      // Send PDF via email using OMailer API
+      await _sendPdfViaEmail(
+        pdfBytes: pdfBytes,
+        recipientEmail: emailController.text,
+        recipientName: namaController.text,
+      );
+
       Get.snackbar(
         'Berhasil',
-        'Laporan PDF berhasil diunduh',
+        'Laporan PDF berhasil diunduh dan dikirim ke email',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.green.withValues(alpha: 0.8),
         colorText: Colors.white,
@@ -504,5 +512,99 @@ class UserFormController extends GetxController {
       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _sendPdfViaEmail({
+    required Uint8List pdfBytes,
+    required String recipientEmail,
+    required String recipientName,
+  }) async {
+    const String apiUrl = 'https://yusnar.my.id/omailer/send';
+
+    final now = DateTime.now();
+    final fileName = 'Laporan_KMeans_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}.pdf';
+
+    final bodyHtml = '''
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+  </head>
+  <body style="font-family: Arial, sans-serif; margin:0; padding:0; color:#333;">
+    <table role="presentation" style="width:100%; border-collapse:collapse;">
+      <tr>
+        <td align="center" style="padding:20px 10px; background:#f6f6f6;">
+          <table role="presentation" style="max-width:600px; width:100%; background:#ffffff; border-radius:8px; overflow:hidden;">
+            <tr>
+              <td style="padding:20px; text-align:center; background:#0d6efd; color:#fff;">
+                <h1 style="margin:0; font-size:22px;">Laporan Hasil Analisis K-Means Clustering</h1>
+                <p style="margin:6px 0 0; font-size:14px; opacity:0.9;">Klasifikasi Persediaan Barang</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px;">
+                <p>Halo <strong>$recipientName</strong>,</p>
+                <p>
+                  Terima kasih telah menggunakan layanan K-Means Clustering. Berikut terlampir laporan hasil analisis Anda.
+                </p>
+                <ul>
+                  <li>Laporan berisi klasifikasi persediaan barang</li>
+                  <li>Rekomendasi pengelolaan stok untuk setiap cluster</li>
+                  <li>Detail perhitungan dan hasil clustering</li>
+                </ul>
+                <p>
+                  Silakan buka file PDF yang terlampir untuk melihat laporan lengkap.
+                </p>
+                <p style="margin-top:24px;">Salam,<br/>Tim K-Means Clustering</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px; text-align:center; font-size:12px; color:#777; background:#fafafa;">
+                Email ini dikirim secara otomatis. Jika Anda tidak melakukan permintaan ini, abaikan saja.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+''';
+
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+      request.fields['smtp_host'] = 'smtp.gmail.com';
+      request.fields['smtp_port'] = '465';
+      request.fields['auth_email'] = 'anggeliawijayanti90@gmail.com';
+      request.fields['auth_password'] = 'khov wuvu gcah wagy';
+      request.fields['sender_name'] = 'K-Means Clustering';
+      request.fields['recipient'] = recipientEmail;
+      request.fields['subject'] = 'Laporan Hasil Analisis K-Means Clustering';
+      request.fields['body_html'] = bodyHtml;
+
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        pdfBytes,
+        filename: fileName,
+      ));
+
+      final response = await request.send();
+
+      if (response.statusCode != 200) {
+        final responseBody = await response.stream.bytesToString();
+        throw Exception('Gagal mengirim email: $responseBody');
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Peringatan',
+        'PDF berhasil diunduh, tetapi gagal mengirim email: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.orange.withValues(alpha: 0.8),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+    }
   }
 }

@@ -39,7 +39,10 @@ class CustomInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 4,
+          runSpacing: 4,
           children: [
             Text(label, style: AppTextStyles.label),
             if (infoTooltip != null) ...[

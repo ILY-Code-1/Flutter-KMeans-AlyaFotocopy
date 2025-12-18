@@ -32,6 +32,7 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
+    final isTablet = Responsive.isTablet(context);
 
     return Container(
       height: preferredSize.height,
@@ -81,7 +82,12 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             const Spacer(),
-            if (menuItems != null && !isMobile) ..._buildMenuItems(context),
+            if (menuItems != null && !isMobile) ...[
+              if (isTablet)
+                _buildMobileMenu(context)
+              else
+                ..._buildMenuItems(context),
+            ],
             if (menuItems != null && isMobile) _buildMobileMenu(context),
             if (actions != null) ...actions!,
           ],

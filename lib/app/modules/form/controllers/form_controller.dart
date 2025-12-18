@@ -577,8 +577,8 @@ class UserFormController extends GetxController {
 
       request.fields['smtp_host'] = 'smtp.gmail.com';
       request.fields['smtp_port'] = '465';
-      request.fields['auth_email'] = 'anggeliawijayanti90@gmail.com';
-      request.fields['auth_password'] = 'khov wuvu gcah wagy';
+      request.fields['auth_email'] = 'bangkitsunarno.dp@gmail.com';
+      request.fields['auth_password'] = 'nshr etep usyg eitr';
       request.fields['sender_name'] = 'K-Means Clustering';
       request.fields['recipient'] = recipientEmail;
       request.fields['subject'] = 'Laporan Hasil Analisis K-Means Clustering';

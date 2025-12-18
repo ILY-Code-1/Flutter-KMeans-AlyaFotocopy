@@ -151,7 +151,7 @@ class UserFormController extends GetxController {
             ),
             pw.Center(
               child: pw.Text(
-                'Klasifikasi Persediaan Barang',
+                'Klasifikasi Persediaan Barang by Alya Fotocopy',
                 style: const pw.TextStyle(fontSize: 12),
               ),
             ),
@@ -539,7 +539,7 @@ class UserFormController extends GetxController {
             <tr>
               <td style="padding:20px; text-align:center; background:#0d6efd; color:#fff;">
                 <h1 style="margin:0; font-size:22px;">Laporan Hasil Analisis K-Means Clustering</h1>
-                <p style="margin:6px 0 0; font-size:14px; opacity:0.9;">Klasifikasi Persediaan Barang</p>
+                <p style="margin:6px 0 0; font-size:14px; opacity:0.9;">Klasifikasi Persediaan Barang by Alya Fotocopy</p>
               </td>
             </tr>
             <tr>

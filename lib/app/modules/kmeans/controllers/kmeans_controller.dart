@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ItemData {
   String id;
@@ -28,6 +30,36 @@ class ItemData {
     required this.fluktuasiPemakaian,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'namaBarang': namaBarang,
+      'stokAwal': stokAwal,
+      'stokAkhir': stokAkhir,
+      'jumlahMasuk': jumlahMasuk,
+      'jumlahKeluar': jumlahKeluar,
+      'rataRataPemakaian': rataRataPemakaian,
+      'frekuensiRestock': frekuensiRestock,
+      'dayToStockOut': dayToStockOut,
+      'fluktuasiPemakaian': fluktuasiPemakaian,
+    };
+  }
+
+  factory ItemData.fromJson(Map<String, dynamic> json) {
+    return ItemData(
+      id: json['id'] as String,
+      namaBarang: json['namaBarang'] as String,
+      stokAwal: (json['stokAwal'] as num).toDouble(),
+      stokAkhir: (json['stokAkhir'] as num).toDouble(),
+      jumlahMasuk: (json['jumlahMasuk'] as num).toDouble(),
+      jumlahKeluar: (json['jumlahKeluar'] as num).toDouble(),
+      rataRataPemakaian: (json['rataRataPemakaian'] as num).toDouble(),
+      frekuensiRestock: (json['frekuensiRestock'] as num).toDouble(),
+      dayToStockOut: (json['dayToStockOut'] as num).toDouble(),
+      fluktuasiPemakaian: (json['fluktuasiPemakaian'] as num).toDouble(),
+    );
+  }
+
   Map<String, String> toDisplayMap() {
     return {
       'Stok Awal': stokAwal.toStringAsFixed(0),
@@ -43,6 +75,9 @@ class ItemData {
 }
 
 class KMeansController extends GetxController {
+  static const String _storageKey = 'kmeans_items';
+  final _storage = GetStorage();
+  
   final items = <ItemData>[].obs;
   final isEditing = false.obs;
   final editingId = ''.obs;
@@ -61,6 +96,12 @@ class KMeansController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
   @override
+  void onInit() {
+    super.onInit();
+    _loadItemsFromStorage();
+  }
+
+  @override
   void onClose() {
     namaBarangController.dispose();
     stokAwalController.dispose();
@@ -72,6 +113,19 @@ class KMeansController extends GetxController {
     dayToStockOutController.dispose();
     fluktuasiPemakaianController.dispose();
     super.onClose();
+  }
+
+  void _loadItemsFromStorage() {
+    final storedData = _storage.read<String>(_storageKey);
+    if (storedData != null) {
+      final List<dynamic> jsonList = jsonDecode(storedData);
+      items.value = jsonList.map((json) => ItemData.fromJson(json)).toList();
+    }
+  }
+
+  void _saveItemsToStorage() {
+    final jsonList = items.map((item) => item.toJson()).toList();
+    _storage.write(_storageKey, jsonEncode(jsonList));
   }
 
   void clearForm() {
@@ -127,6 +181,7 @@ class KMeansController extends GetxController {
       );
     }
 
+    _saveItemsToStorage();
     clearForm();
   }
 
@@ -147,6 +202,7 @@ class KMeansController extends GetxController {
 
   void deleteItem(String id) {
     items.removeWhere((e) => e.id == id);
+    _saveItemsToStorage();
     Get.snackbar(
       'Berhasil',
       'Data berhasil dihapus',

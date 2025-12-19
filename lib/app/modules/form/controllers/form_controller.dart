@@ -8,8 +8,12 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:get_storage/get_storage.dart';
 
 class UserFormController extends GetxController {
+  static const String _resultIdKey = 'kmeans_result_id';
+  final _storage = GetStorage();
+
   final namaController = TextEditingController();
   final emailController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -24,6 +28,9 @@ class UserFormController extends GetxController {
     final args = Get.arguments;
     if (args != null && args['resultId'] != null) {
       resultId = args['resultId'];
+      _storage.write(_resultIdKey, resultId);
+    } else {
+      resultId = _storage.read<String>(_resultIdKey);
     }
   }
 
@@ -89,6 +96,10 @@ class UserFormController extends GetxController {
         recipientEmail: emailController.text,
         recipientName: namaController.text,
       );
+
+      // Clear stored data after successful submission
+      _storage.remove(_resultIdKey);
+      _storage.remove('kmeans_items');
 
       Get.snackbar(
         'Berhasil',

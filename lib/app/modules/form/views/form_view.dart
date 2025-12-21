@@ -11,9 +11,10 @@ class FormView extends GetView<UserFormController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomNavbar(
+      appBar: CustomNavbar(
         title: 'Data Pengguna',
         showBackButton: true,
+        onBackPressed: () => Get.offNamed('/kmeans'),
       ),
       body: SingleChildScrollView(
         child: ResponsiveContainer(

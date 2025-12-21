@@ -11,9 +11,10 @@ class KMeansView extends GetView<KMeansController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomNavbar(
+      appBar: CustomNavbar(
         title: 'K-Means Clustering',
         showBackButton: true,
+        onBackPressed: () => Get.offNamed('/'),
       ),
       body: SingleChildScrollView(
         child: ResponsiveContainer(

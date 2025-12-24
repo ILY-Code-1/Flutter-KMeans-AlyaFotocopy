@@ -587,7 +587,7 @@ class UserFormController extends GetxController {
       final request = http.MultipartRequest('POST', Uri.parse(apiUrl));
 
       request.fields['smtp_host'] = 'smtp.gmail.com';
-      request.fields['smtp_port'] = '465';
+      request.fields['smtp_port'] = '587';
       request.fields['auth_email'] = 'bangkitsunarno.dp@gmail.com';
       request.fields['auth_password'] = 'nshr etep usyg eitr';
       request.fields['sender_name'] = 'K-Means Clustering';

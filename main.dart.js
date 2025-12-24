@@ -86873,7 +86873,7 @@ e='<!doctype html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <meta na
 q=3
 o=B.aSo("POST",B.k2("https://yusnar.my.id/omailer/send",0,null))
 o.x.m(0,"smtp_host","smtp.gmail.com")
-o.x.m(0,"smtp_port","465")
+o.x.m(0,"smtp_port","587")
 o.x.m(0,"auth_email","bangkitsunarno.dp@gmail.com")
 o.x.m(0,"auth_password","nshr etep usyg eitr")
 o.x.m(0,"sender_name","K-Means Clustering")

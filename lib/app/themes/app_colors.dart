@@ -41,4 +41,8 @@ class AppColors {
   static const Color softGreen = Color(0xFFE6FFFA);
   static const Color softPurple = Color(0xFFF3E8FF);
   static const Color softOrange = Color(0xFFFFF5EB);
+
+  // Login Page Specific Colors
+  static const Color loginBackground = Color(0xFFE4ECFF);
+  static const Color loginButtonOrange = Color(0xFFF7941D);
 }

@@ -17,6 +17,16 @@ class HomeView extends GetView<HomeController> {
           NavMenuItem(label: 'Tentang K-Means', onTap: controller.scrollToAbout),
           NavMenuItem(label: 'Cara Penggunaan', onTap: controller.scrollToGuide),
         ],
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.logout,
+              color: AppColors.error,
+            ),
+            onPressed: controller.showLogoutDialog,
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         controller: controller.scrollController,

@@ -77,7 +77,7 @@ class ItemData {
 class KMeansController extends GetxController {
   static const String _storageKey = 'kmeans_items';
   final _storage = GetStorage();
-  
+
   final items = <ItemData>[].obs;
   final isEditing = false.obs;
   final editingId = ''.obs;
@@ -146,7 +146,9 @@ class KMeansController extends GetxController {
     if (!formKey.currentState!.validate()) return;
 
     final item = ItemData(
-      id: isEditing.value ? editingId.value : DateTime.now().millisecondsSinceEpoch.toString(),
+      id: isEditing.value
+          ? editingId.value
+          : DateTime.now().millisecondsSinceEpoch.toString(),
       namaBarang: namaBarangController.text,
       stokAwal: double.tryParse(stokAwalController.text) ?? 0,
       stokAkhir: double.tryParse(stokAkhirController.text) ?? 0,
@@ -155,7 +157,8 @@ class KMeansController extends GetxController {
       rataRataPemakaian: double.tryParse(rataRataPemakaianController.text) ?? 0,
       frekuensiRestock: double.tryParse(frekuensiRestockController.text) ?? 0,
       dayToStockOut: double.tryParse(dayToStockOutController.text) ?? 0,
-      fluktuasiPemakaian: double.tryParse(fluktuasiPemakaianController.text) ?? 0,
+      fluktuasiPemakaian:
+          double.tryParse(fluktuasiPemakaianController.text) ?? 0,
     );
 
     if (isEditing.value) {
@@ -194,10 +197,14 @@ class KMeansController extends GetxController {
     stokAkhirController.text = item.stokAkhir.toStringAsFixed(0);
     jumlahMasukController.text = item.jumlahMasuk.toStringAsFixed(0);
     jumlahKeluarController.text = item.jumlahKeluar.toStringAsFixed(0);
-    rataRataPemakaianController.text = item.rataRataPemakaian.toStringAsFixed(2);
+    rataRataPemakaianController.text = item.rataRataPemakaian.toStringAsFixed(
+      2,
+    );
     frekuensiRestockController.text = item.frekuensiRestock.toStringAsFixed(0);
     dayToStockOutController.text = item.dayToStockOut.toStringAsFixed(1);
-    fluktuasiPemakaianController.text = item.fluktuasiPemakaian.toStringAsFixed(2);
+    fluktuasiPemakaianController.text = item.fluktuasiPemakaian.toStringAsFixed(
+      2,
+    );
   }
 
   void deleteItem(String id) {
@@ -265,20 +272,27 @@ class KMeansController extends GetxController {
     const int maxIterations = 100;
 
     // Extract features for clustering (6 features)
-    List<List<double>> dataPoints = items.map((item) => [
-      item.jumlahMasuk,
-      item.jumlahKeluar,
-      item.rataRataPemakaian,
-      item.frekuensiRestock,
-      item.dayToStockOut,
-      item.fluktuasiPemakaian,
-    ]).toList();
+    List<List<double>> dataPoints = items
+        .map(
+          (item) => [
+            item.jumlahMasuk,
+            item.jumlahKeluar,
+            item.rataRataPemakaian,
+            item.frekuensiRestock,
+            item.dayToStockOut,
+            item.fluktuasiPemakaian,
+          ],
+        )
+        .toList();
 
     // Normalize data
     final normalizedData = _normalizeData(dataPoints);
 
     // Initialize centroids using K-Means++ method
-    List<List<double>> centroids = _initializeCentroidsKMeansPlusPlus(normalizedData, k);
+    List<List<double>> centroids = _initializeCentroidsKMeansPlusPlus(
+      normalizedData,
+      k,
+    );
 
     List<int> assignments = List.filled(items.length, 0);
     List<List<double>> previousCentroids = [];
@@ -325,10 +339,14 @@ class KMeansController extends GetxController {
         'iteration': iteration + 1,
         'centroids': _convertCentroidsToMap(centroids),
         'assignments': List<int>.from(assignments),
-        'distanceCalculations': distanceCalculations.map((dc) => {
-          ...dc,
-          'distances': _convertListToMap(dc['distances'] as List<double>),
-        }).toList(),
+        'distanceCalculations': distanceCalculations
+            .map(
+              (dc) => {
+                ...dc,
+                'distances': _convertListToMap(dc['distances'] as List<double>),
+              },
+            )
+            .toList(),
       });
 
       // Check convergence
@@ -341,7 +359,10 @@ class KMeansController extends GetxController {
     final clusterAnalysis = _analyzeAndSortClusters(assignments, k);
 
     // Generate recommendations
-    final recommendations = _generateRecommendations(assignments, clusterAnalysis);
+    final recommendations = _generateRecommendations(
+      assignments,
+      clusterAnalysis,
+    );
 
     // Build detailed result
     return {
@@ -354,23 +375,29 @@ class KMeansController extends GetxController {
       'clusterAnalysis': clusterAnalysis,
       'itemResults': _buildItemResults(assignments, clusterAnalysis),
       'recommendations': recommendations,
-      'rawData': items.map((item) => {
-        'id': item.id,
-        'namaBarang': item.namaBarang,
-        'stokAwal': item.stokAwal,
-        'stokAkhir': item.stokAkhir,
-        'jumlahMasuk': item.jumlahMasuk,
-        'jumlahKeluar': item.jumlahKeluar,
-        'rataRataPemakaian': item.rataRataPemakaian,
-        'frekuensiRestock': item.frekuensiRestock,
-        'dayToStockOut': item.dayToStockOut,
-        'fluktuasiPemakaian': item.fluktuasiPemakaian,
-      }).toList(),
+      'rawData': items
+          .map(
+            (item) => {
+              'id': item.id,
+              'namaBarang': item.namaBarang,
+              'stokAwal': item.stokAwal,
+              'stokAkhir': item.stokAkhir,
+              'jumlahMasuk': item.jumlahMasuk,
+              'jumlahKeluar': item.jumlahKeluar,
+              'rataRataPemakaian': item.rataRataPemakaian,
+              'frekuensiRestock': item.frekuensiRestock,
+              'dayToStockOut': item.dayToStockOut,
+              'fluktuasiPemakaian': item.fluktuasiPemakaian,
+            },
+          )
+          .toList(),
     };
   }
 
   // Helper methods to convert nested arrays to maps for Firebase compatibility
-  Map<String, Map<String, double>> _convertCentroidsToMap(List<List<double>> centroids) {
+  Map<String, Map<String, double>> _convertCentroidsToMap(
+    List<List<double>> centroids,
+  ) {
     Map<String, Map<String, double>> result = {};
     for (int i = 0; i < centroids.length; i++) {
       result['c$i'] = _convertListToMap(centroids[i]);
@@ -411,7 +438,10 @@ class KMeansController extends GetxController {
     }).toList();
   }
 
-  List<List<double>> _initializeCentroidsKMeansPlusPlus(List<List<double>> data, int k) {
+  List<List<double>> _initializeCentroidsKMeansPlusPlus(
+    List<List<double>> data,
+    int k,
+  ) {
     final random = Random();
     List<List<double>> centroids = [];
 
@@ -456,9 +486,16 @@ class KMeansController extends GetxController {
     return sqrt(sum);
   }
 
-  List<List<double>> _updateCentroids(List<List<double>> data, List<int> assignments, int k) {
+  List<List<double>> _updateCentroids(
+    List<List<double>> data,
+    List<int> assignments,
+    int k,
+  ) {
     int numFeatures = data[0].length;
-    List<List<double>> newCentroids = List.generate(k, (_) => List.filled(numFeatures, 0.0));
+    List<List<double>> newCentroids = List.generate(
+      k,
+      (_) => List.filled(numFeatures, 0.0),
+    );
     List<int> counts = List.filled(k, 0);
 
     for (int i = 0; i < data.length; i++) {
@@ -480,7 +517,10 @@ class KMeansController extends GetxController {
     return newCentroids;
   }
 
-  bool _hasConverged(List<List<double>> oldCentroids, List<List<double>> newCentroids) {
+  bool _hasConverged(
+    List<List<double>> oldCentroids,
+    List<List<double>> newCentroids,
+  ) {
     const double threshold = 0.0001;
     for (int i = 0; i < oldCentroids.length; i++) {
       if (_euclideanDistance(oldCentroids[i], newCentroids[i]) > threshold) {
@@ -509,7 +549,9 @@ class KMeansController extends GetxController {
 
     // Sort clusters by average consumption (descending)
     List<int> sortedIndices = List.generate(k, (i) => i);
-    sortedIndices.sort((a, b) => avgConsumption[b].compareTo(avgConsumption[a]));
+    sortedIndices.sort(
+      (a, b) => avgConsumption[b].compareTo(avgConsumption[a]),
+    );
 
     // Create mapping: original cluster -> sorted cluster (1-based)
     // Use String keys for Firebase compatibility
@@ -534,9 +576,16 @@ class KMeansController extends GetxController {
     };
   }
 
-  List<Map<String, dynamic>> _buildItemResults(List<int> assignments, Map<String, dynamic> clusterAnalysis) {
-    Map<String, int> clusterMapping = Map<String, int>.from(clusterAnalysis['clusterMapping']);
-    List<String> clusterLabels = List<String>.from(clusterAnalysis['clusterLabels']);
+  List<Map<String, dynamic>> _buildItemResults(
+    List<int> assignments,
+    Map<String, dynamic> clusterAnalysis,
+  ) {
+    Map<String, int> clusterMapping = Map<String, int>.from(
+      clusterAnalysis['clusterMapping'],
+    );
+    List<String> clusterLabels = List<String>.from(
+      clusterAnalysis['clusterLabels'],
+    );
 
     return List.generate(items.length, (i) {
       int originalCluster = assignments[i];
@@ -560,8 +609,13 @@ class KMeansController extends GetxController {
     });
   }
 
-  List<Map<String, dynamic>> _generateRecommendations(List<int> assignments, Map<String, dynamic> clusterAnalysis) {
-    Map<String, int> clusterMapping = Map<String, int>.from(clusterAnalysis['clusterMapping']);
+  List<Map<String, dynamic>> _generateRecommendations(
+    List<int> assignments,
+    Map<String, dynamic> clusterAnalysis,
+  ) {
+    Map<String, int> clusterMapping = Map<String, int>.from(
+      clusterAnalysis['clusterMapping'],
+    );
     List<Map<String, dynamic>> recommendations = [];
 
     for (int i = 0; i < items.length; i++) {
@@ -571,17 +625,20 @@ class KMeansController extends GetxController {
 
       switch (sortedCluster) {
         case 1: // Barang Cepat Habis
-          recommendation = 'Tingkatkan frekuensi restock dan pertimbangkan untuk menambah stok safety. '
+          recommendation =
+              'Tingkatkan frekuensi restock dan pertimbangkan untuk menambah stok safety. '
               'Perhatikan tren permintaan untuk antisipasi lonjakan.';
           priority = 'Tinggi';
           break;
         case 2: // Barang Kebutuhan Normal
-          recommendation = 'Pertahankan level stok saat ini dengan pemantauan berkala. '
+          recommendation =
+              'Pertahankan level stok saat ini dengan pemantauan berkala. '
               'Lakukan restock sesuai jadwal normal.';
           priority = 'Sedang';
           break;
         case 3: // Barang Jarang Terpakai
-          recommendation = 'Kurangi jumlah stok untuk menghindari dead stock. '
+          recommendation =
+              'Kurangi jumlah stok untuk menghindari dead stock. '
               'Pertimbangkan promosi atau bundling untuk meningkatkan perputaran.';
           priority = 'Rendah';
           break;

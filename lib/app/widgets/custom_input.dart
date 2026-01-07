@@ -15,6 +15,8 @@ class CustomInput extends StatelessWidget {
   final bool enabled;
   final void Function(String)? onChanged;
   final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
 
   const CustomInput({
     super.key,
@@ -31,6 +33,8 @@ class CustomInput extends StatelessWidget {
     this.enabled = true,
     this.onChanged,
     this.focusNode,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -68,6 +72,8 @@ class CustomInput extends StatelessWidget {
           enabled: enabled,
           onChanged: onChanged,
           focusNode: focusNode,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
           style: AppTextStyles.bodyMedium,
           decoration: InputDecoration(
             hintText: hint,

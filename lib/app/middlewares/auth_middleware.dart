@@ -12,8 +12,21 @@ class AuthMiddleware extends GetMiddleware {
   RouteSettings? redirect(String? route) {
     final authService = Get.find<AuthService>();
     
-    // Jika belum login, redirect ke login page
+    // Jika belum login atau session expired, redirect ke login page
     if (!authService.isAuthenticated) {
+      // Tampilkan notifikasi jika sebelumnya ada user yang login (session expired)
+      if (authService.currentUsername.value.isNotEmpty) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.snackbar(
+            'Session Expired',
+            'Session Anda telah berakhir. Silakan login kembali.',
+            backgroundColor: Colors.orange.shade100,
+            colorText: Colors.orange.shade900,
+            duration: const Duration(seconds: 3),
+          );
+        });
+      }
+      
       return const RouteSettings(name: Routes.login);
     }
     

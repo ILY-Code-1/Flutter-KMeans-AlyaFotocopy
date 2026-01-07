@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(lib\\app\\services/**)",
+      "Edit(lib\\app\\middlewares/**)",
+      "Edit(lib/**)",
+      "Edit(lib\\app\\widgets/**)",
+      "Edit(lib\\app\\modules\\login\\views/**)"
+    ]
+  }
+}

@@ -117,6 +117,7 @@ class LoginView extends GetView<LoginController> {
       keyboardType: TextInputType.emailAddress,
       prefixIcon: const Icon(Icons.person_outline),
       validator: controller.validateUsername,
+      textInputAction: TextInputAction.next,
     );
   }
 
@@ -137,6 +138,12 @@ class LoginView extends GetView<LoginController> {
           onPressed: controller.togglePasswordVisibility,
         ),
         validator: controller.validatePassword,
+        textInputAction: TextInputAction.done,
+        onFieldSubmitted: (_) {
+          if (!controller.isLoading.value) {
+            controller.signIn();
+          }
+        },
       ),
     );
   }

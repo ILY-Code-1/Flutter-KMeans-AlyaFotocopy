@@ -13,6 +13,10 @@ class AuthService extends GetxService {
   // Key untuk local storage
   static const String _keyIsLoggedIn = 'is_logged_in';
   static const String _keyUsername = 'username';
+  static const String _keyLoginTimestamp = 'login_timestamp';
+  
+  // Durasi session: 24 jam dalam milliseconds
+  static const int _sessionDuration = 24 * 60 * 60 * 1000; // 24 jam
   
   @override
   void onInit() {
@@ -24,6 +28,29 @@ class AuthService extends GetxService {
   void _loadAuthState() {
     isLoggedIn.value = _storage.read(_keyIsLoggedIn) ?? false;
     currentUsername.value = _storage.read(_keyUsername) ?? '';
+    
+    // Cek apakah session sudah expired
+    if (isLoggedIn.value && _isSessionExpired()) {
+      // Jika expired, logout otomatis
+      logout();
+    }
+  }
+  
+  // Cek apakah session sudah expired (lebih dari 24 jam)
+  bool _isSessionExpired() {
+    final loginTimestamp = _storage.read(_keyLoginTimestamp);
+    
+    if (loginTimestamp == null) {
+      // Jika tidak ada timestamp, anggap expired
+      return true;
+    }
+    
+    final loginTime = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
+    final currentTime = DateTime.now();
+    final difference = currentTime.difference(loginTime).inMilliseconds;
+    
+    // Return true jika sudah lebih dari 24 jam
+    return difference > _sessionDuration;
   }
   
   // Login dengan username dan password dari Firebase
@@ -66,9 +93,10 @@ class AuthService extends GetxService {
         };
       }
       
-      // Login berhasil - simpan ke local storage
+      // Login berhasil - simpan ke local storage dengan timestamp
       await _storage.write(_keyIsLoggedIn, true);
       await _storage.write(_keyUsername, username);
+      await _storage.write(_keyLoginTimestamp, DateTime.now().millisecondsSinceEpoch);
       
       isLoggedIn.value = true;
       currentUsername.value = username;
@@ -90,13 +118,27 @@ class AuthService extends GetxService {
   Future<void> logout() async {
     await _storage.remove(_keyIsLoggedIn);
     await _storage.remove(_keyUsername);
+    await _storage.remove(_keyLoginTimestamp);
     
     isLoggedIn.value = false;
     currentUsername.value = '';
   }
   
-  // Cek apakah user sudah login
-  bool get isAuthenticated => isLoggedIn.value;
+  // Cek apakah user sudah login dan session masih valid
+  bool get isAuthenticated {
+    if (!isLoggedIn.value) {
+      return false;
+    }
+    
+    // Cek apakah session expired
+    if (_isSessionExpired()) {
+      // Auto logout jika expired
+      logout();
+      return false;
+    }
+    
+    return true;
+  }
   
   // Get username yang sedang login
   String get username => currentUsername.value;

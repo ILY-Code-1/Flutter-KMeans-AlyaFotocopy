@@ -26,11 +26,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Cek auth state saat app start
+    final authService = Get.find<AuthService>();
+    final initialRoute = authService.isAuthenticated ? Routes.home : Routes.login;
+    
     return GetMaterialApp(
       title: 'K-Means Alya Fotocopy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppPages.initial,
+      initialRoute: initialRoute,
       getPages: AppPages.routes,
       defaultTransition: Transition.fadeIn,
     );

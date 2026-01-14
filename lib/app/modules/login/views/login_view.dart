@@ -10,11 +10,22 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE4ECFF), // Soft blue background
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: _buildLoginCard(),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background.jpg"),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.4),
+              BlendMode.darken,
+            ),
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: _buildLoginCard(),
+          ),
         ),
       ),
     );
@@ -78,16 +89,12 @@ class LoginView extends GetView<LoginController> {
             ],
           ),
           child: const Center(
-            child: Icon(
-              Icons.analytics_rounded,
-              color: Colors.white,
-              size: 32,
-            ),
+            child: Icon(Icons.analytics_rounded, color: Colors.white, size: 32),
           ),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'MEANS EASY TOOL',
+          'K-MEANS ALYA FOTOCOPY',
           style: AppTextStyles.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
             letterSpacing: 1.2,

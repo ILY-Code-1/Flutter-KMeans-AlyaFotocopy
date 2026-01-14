@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../services/auth_service.dart';
 import '../../../routes/app_pages.dart';
+import '../../../widgets/custom_navbar.dart';
 
 class HomeController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
@@ -18,6 +19,32 @@ class HomeController extends GetxController {
   void onClose() {
     scrollController.dispose();
     super.onClose();
+  }
+  
+  // Get menu items berdasarkan role user
+  List<NavMenuItem> getMenuItems() {
+    if (_authService.isAdmin) {
+      // Menu untuk admin
+      return [
+        NavMenuItem(label: 'Kelola User', onTap: navigateToUserManagement),
+        NavMenuItem(label: 'Riwayat', onTap: navigateToHistory),
+      ];
+    } else {
+      // Menu untuk staff (default)
+      return [
+        NavMenuItem(label: 'Beranda', onTap: scrollToHero),
+        NavMenuItem(label: 'Tentang K-Means', onTap: scrollToAbout),
+        NavMenuItem(label: 'Cara Penggunaan', onTap: scrollToGuide),
+      ];
+    }
+  }
+  
+  void navigateToUserManagement() {
+    Get.toNamed(Routes.userManagement);
+  }
+  
+  void navigateToHistory() {
+    Get.toNamed(Routes.history);
   }
 
   void navigateToKMeans() {

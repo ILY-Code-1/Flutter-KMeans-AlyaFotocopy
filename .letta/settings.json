@@ -5,7 +5,17 @@
       "Edit(lib\\app\\middlewares/**)",
       "Edit(lib/**)",
       "Edit(lib\\app\\widgets/**)",
-      "Edit(lib\\app\\modules\\login\\views/**)"
+      "Edit(lib\\app\\modules\\login\\views/**)",
+      "Edit(lib\\app\\modules\\home\\views/**)",
+      "Edit(lib\\app\\modules\\home\\controllers/**)",
+      "Edit(lib\\app\\routes/**)",
+      "Bash(mkdir -p \"C:\\Flutter\\FlutterProjects\\flutter_kmeans_fotocopy\\lib\\app\\modules\\history\\bindings\")",
+      "Bash(mkdir -p \"C:\\Flutter\\FlutterProjects\\flutter_kmeans_fotocopy\\lib\\app\\modules\\history\\controllers\")",
+      "Bash(mkdir -p \"C:\\Flutter\\FlutterProjects\\flutter_kmeans_fotocopy\\lib\\app\\modules\\history\\views\")",
+      "Write(**)",
+      "Edit(lib\\app\\modules\\user_management\\views/**)",
+      "Edit(lib\\app\\modules\\history\\views/**)",
+      "Edit(lib\\app\\modules\\history\\controllers/**)"
     ]
   }
 }

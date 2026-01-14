@@ -9,4 +9,6 @@ abstract class Routes {
   static const form = '/form';
   static const success = '/success';
   static const guide = '/guide';
+  static const userManagement = '/user-management';
+  static const history = '/history';
 }

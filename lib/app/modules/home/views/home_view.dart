@@ -12,11 +12,7 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomNavbar(
-        menuItems: [
-          NavMenuItem(label: 'Beranda', onTap: controller.scrollToHero),
-          NavMenuItem(label: 'Tentang K-Means', onTap: controller.scrollToAbout),
-          NavMenuItem(label: 'Cara Penggunaan', onTap: controller.scrollToGuide),
-        ],
+        menuItems: controller.getMenuItems(),
         actions: [
           IconButton(
             icon: const Icon(

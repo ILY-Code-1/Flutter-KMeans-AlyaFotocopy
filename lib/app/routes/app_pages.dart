@@ -11,6 +11,10 @@ import '../modules/form/views/form_view.dart';
 import '../modules/success/views/success_view.dart';
 import '../modules/guide/bindings/guide_binding.dart';
 import '../modules/guide/views/guide_view.dart';
+import '../modules/user_management/bindings/user_management_binding.dart';
+import '../modules/user_management/views/user_management_view.dart';
+import '../modules/history/bindings/history_binding.dart';
+import '../modules/history/views/history_view.dart';
 import '../middlewares/auth_middleware.dart';
 
 part 'app_routes.dart';
@@ -64,6 +68,22 @@ class AppPages {
       page: () => const GuideView(),
       binding: GuideBinding(),
       transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.userManagement,
+      page: () => const UserManagementView(),
+      binding: UserManagementBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.history,
+      page: () => const HistoryView(),
+      binding: HistoryBinding(),
+      transition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthMiddleware()],
     ),

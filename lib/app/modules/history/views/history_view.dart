@@ -296,21 +296,6 @@ class HistoryView extends GetView<HistoryController> {
               DataColumn(
                 label: Row(
                   children: [
-                    Icon(Icons.group_work, size: 18, color: AppColors.primary),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Clusters',
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              DataColumn(
-                label: Row(
-                  children: [
                     Icon(
                       Icons.settings_outlined,
                       size: 18,
@@ -421,38 +406,6 @@ class HistoryView extends GetView<HistoryController> {
                       ),
                       child: Text(
                         '${result['iterations'] ?? 0}x',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.purple.shade400,
-                            Colors.purple.shade600,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.purple.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        '${result['clusters']?.length ?? 0} cluster',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -607,11 +560,6 @@ class HistoryView extends GetView<HistoryController> {
                                   '${result['iterations'] ?? 0}x',
                                   Colors.green,
                                   Icons.refresh,
-                                ),
-                                _buildMobileBadge(
-                                  '${result['clusters']?.length ?? 0} cluster',
-                                  Colors.purple,
-                                  Icons.group_work,
                                 ),
                               ],
                             ),

@@ -30,12 +30,8 @@ class HomeController extends GetxController {
         NavMenuItem(label: 'Riwayat', onTap: navigateToHistory),
       ];
     } else {
-      // Menu untuk staff (default)
-      return [
-        NavMenuItem(label: 'Beranda', onTap: scrollToHero),
-        NavMenuItem(label: 'Tentang K-Means', onTap: scrollToAbout),
-        NavMenuItem(label: 'Cara Penggunaan', onTap: scrollToGuide),
-      ];
+      // Menu untuk staff (default) - kosong, tidak ada menu scroll
+      return [];
     }
   }
   

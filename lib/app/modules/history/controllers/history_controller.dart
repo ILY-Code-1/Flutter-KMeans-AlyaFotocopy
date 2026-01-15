@@ -77,267 +77,262 @@ class HistoryController extends GetxController {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Container(
-          width: 700,
-          constraints: const BoxConstraints(maxHeight: 600),
-          padding: const EdgeInsets.all(24),
+          width: 800,
+          constraints: const BoxConstraints(maxHeight: 700),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF4A90E2), Color(0xFF7AB8F5)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.analytics,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Detail Hasil Analisis',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          formatTimestamp(result['timestamp']),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
+              // Close button at top right
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Get.back(),
-                  ),
-                ],
-              ),
-              const Divider(height: 32),
-              
-              // Content
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Info Cards
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildInfoCard(
-                              'Total Items',
-                              '${result['totalItems'] ?? 0}',
-                              Icons.inventory_2_outlined,
-                              Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildInfoCard(
-                              'Iterasi',
-                              '${result['iterations'] ?? 0}',
-                              Icons.refresh,
-                              Colors.green,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildInfoCard(
-                              'Clusters',
-                              '${result['clusters']?.length ?? 0}',
-                              Icons.group_work,
-                              Colors.purple,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      
-                      // User Info
-                      if (result['userName'] != null || result['userEmail'] != null) ...[
-                        const Text(
-                          'Informasi Pengguna',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Column(
-                            children: [
-                              if (result['userName'] != null)
-                                Row(
-                                  children: [
-                                    Icon(Icons.person, size: 20, color: Colors.grey.shade700),
-                                    const SizedBox(width: 8),
-                                    Text('Nama: ${result['userName']}'),
-                                  ],
-                                ),
-                              if (result['userEmail'] != null) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.email, size: 20, color: Colors.grey.shade700),
-                                    const SizedBox(width: 8),
-                                    Text('Email: ${result['userEmail']}'),
-                                  ],
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                      
-                      // Clusters Detail
-                      if (result['clusters'] != null) ...[
-                        const Text(
-                          'Detail Cluster',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        ...((result['clusters'] as List).asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final cluster = entry.value as Map<String, dynamic>;
-                          final items = cluster['items'] as List? ?? [];
-                          
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  _getClusterColor(index).withOpacity(0.1),
-                                  _getClusterColor(index).withOpacity(0.05),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _getClusterColor(index).withOpacity(0.3),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _getClusterColor(index),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Text(
-                                        cluster['label'] ?? 'Cluster ${index + 1}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      '${items.length} items',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade700,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (items.isNotEmpty) ...[
-                                  const SizedBox(height: 12),
-                                  ...items.map((item) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 4),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.circle,
-                                            size: 8,
-                                            color: _getClusterColor(index),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Text(
-                                              item['name'] ?? '-',
-                                              style: const TextStyle(fontSize: 14),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                ],
-                              ],
-                            ),
-                          );
-                        }).toList()),
-                      ],
-                    ],
+                    tooltip: 'Tutup',
                   ),
                 ),
               ),
               
-              const SizedBox(height: 16),
-              // Actions
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () => Get.back(),
-                    icon: const Icon(Icons.close),
-                    label: const Text('Tutup'),
+              // Content - PDF-like layout
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Get.back();
-                      downloadPDF(result);
-                    },
-                    icon: const Icon(Icons.download),
-                    label: const Text('Download PDF'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4A90E2),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(40),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Header - Like PDF
+                        const Center(
+                          child: Text(
+                            'LAPORAN HASIL ANALISIS K-MEANS CLUSTERING',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF212121),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Center(
+                          child: Text(
+                            'Klasifikasi Persediaan Barang by Alya Fotocopy',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF424242),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Info Section - Like PDF
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade400),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Informasi Laporan',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              const Divider(),
+                              _buildInfoRow('Tanggal Analisis:', formatTimestamp(result['timestamp'])),
+                              const SizedBox(height: 5),
+                              _buildInfoRow('Total Barang:', '${result['totalItems'] ?? 0} item'),
+                              const SizedBox(height: 5),
+                              _buildInfoRow('Total Iterasi:', '${result['iterations'] ?? 0} iterasi'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Summary Section - Like PDF
+                        const Text(
+                          'Ringkasan Hasil Clustering',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF212121),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        
+                        // Summary Table - Like PDF
+                        _buildClusterSummaryTable(result),
+                        const SizedBox(height: 20),
+                        
+                        // Data Table - Like PDF
+                        if (result['rawData'] != null && result['itemResults'] != null) ...[
+                          const Text(
+                            'Data Barang dan Hasil Clustering',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF212121),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildDataTable(result),
+                          const SizedBox(height: 20),
+                        ],
+                        
+                        // Clusters Detail - Like PDF
+                        const Text(
+                          'Detail per Cluster',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF212121),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        
+                        ...((result['itemResults'] as List? ?? []).fold<Map<int, List<Map<String, dynamic>>>>(
+                          {},
+                          (map, item) {
+                            final cluster = item['cluster'] as int;
+                            if (!map.containsKey(cluster)) {
+                              map[cluster] = [];
+                            }
+                            map[cluster]!.add(item as Map<String, dynamic>);
+                            return map;
+                          },
+                        ).entries.map((entry) {
+                          final clusterNum = entry.key;
+                          final items = entry.value;
+                          
+                          String title;
+                          Color bgColor;
+                          
+                          switch (clusterNum) {
+                            case 1:
+                              title = 'Cluster 1 (C1): Barang Cepat Habis';
+                              bgColor = const Color(0xFFFFCDD2); // red100
+                              break;
+                            case 2:
+                              title = 'Cluster 2 (C2): Barang Kebutuhan Normal';
+                              bgColor = const Color(0xFFFFF9C4); // yellow100
+                              break;
+                            case 3:
+                              title = 'Cluster 3 (C3): Barang Jarang Terpakai';
+                              bgColor = const Color(0xFFC8E6C9); // green100
+                              break;
+                            default:
+                              title = 'Cluster $clusterNum';
+                              bgColor = Colors.grey.shade200;
+                          }
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: bgColor,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      'Barang: ${items.map((e) => e['namaBarang']).join(', ')}',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          );
+                        }).toList()),
+                        
+                        // Recommendations - Like PDF
+                        if (result['recommendations'] != null) ...[
+                          const Text(
+                            'Rekomendasi',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF212121),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRecommendationsSection(result),
+                        ],
+                      ],
                     ),
                   ),
-                ],
+                ),
+              ),
+              
+              // Actions
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  border: Border(
+                    top: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.close),
+                      label: const Text('Tutup'),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Get.back();
+                        downloadPDF(result);
+                      },
+                      icon: const Icon(Icons.download),
+                      label: const Text('Download PDF'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4A90E2),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -347,38 +342,201 @@ class HistoryController extends GetxController {
     );
   }
   
-  Widget _buildInfoCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+  // Build info row for detail view
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12)),
+        Text(value, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+  
+  // Build cluster summary table
+  Widget _buildClusterSummaryTable(Map<String, dynamic> result) {
+    final itemResults = result['itemResults'] as List? ?? [];
+    final cluster1Count = itemResults.where((item) => item['cluster'] == 1).length;
+    final cluster2Count = itemResults.where((item) => item['cluster'] == 2).length;
+    final cluster3Count = itemResults.where((item) => item['cluster'] == 3).length;
+    
+    return Table(
+      border: TableBorder.all(color: Colors.grey.shade400),
+      children: [
+        TableRow(
+          decoration: BoxDecoration(color: Colors.grey.shade200),
+          children: [
+            _buildTableHeader('Cluster'),
+            _buildTableHeader('Kategori'),
+            _buildTableHeader('Jumlah Barang'),
+          ],
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        _buildSummaryRow('C1', 'Barang Cepat Habis', '$cluster1Count item'),
+        _buildSummaryRow('C2', 'Barang Kebutuhan Normal', '$cluster2Count item'),
+        _buildSummaryRow('C3', 'Barang Jarang Terpakai', '$cluster3Count item'),
+      ],
+    );
+  }
+  
+  Widget _buildTableHeader(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
       ),
-      child: Column(
+    );
+  }
+  
+  TableRow _buildSummaryRow(String cluster, String category, String count) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Text(cluster, style: const TextStyle(fontSize: 11)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Text(category, style: const TextStyle(fontSize: 11)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Text(count, style: const TextStyle(fontSize: 11)),
+        ),
+      ],
+    );
+  }
+  
+  // Build data table
+  Widget _buildDataTable(Map<String, dynamic> result) {
+    final rawData = result['rawData'] as List? ?? [];
+    final itemResults = result['itemResults'] as List? ?? [];
+    
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Table(
+        border: TableBorder.all(color: Colors.grey.shade400),
+        columnWidths: const {
+          0: FixedColumnWidth(40),
+          1: FixedColumnWidth(150),
+          2: FixedColumnWidth(80),
+          3: FixedColumnWidth(80),
+          4: FixedColumnWidth(80),
+          5: FixedColumnWidth(80),
+          6: FixedColumnWidth(80),
+          7: FixedColumnWidth(80),
+          8: FixedColumnWidth(60),
+        },
         children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+          TableRow(
+            decoration: BoxDecoration(color: Colors.grey.shade200),
+            children: [
+              _buildDataTableHeader('No'),
+              _buildDataTableHeader('Nama Barang'),
+              _buildDataTableHeader('Jml Masuk'),
+              _buildDataTableHeader('Jml Keluar'),
+              _buildDataTableHeader('Rata2 Pakai'),
+              _buildDataTableHeader('Frek Restock'),
+              _buildDataTableHeader('Est. Habis'),
+              _buildDataTableHeader('Fluktuasi'),
+              _buildDataTableHeader('Cluster'),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
-          ),
+          ...List.generate(rawData.length, (index) {
+            final raw = rawData[index] as Map<String, dynamic>;
+            final itemResult = itemResults.firstWhere(
+              (r) => r['itemId'] == raw['id'],
+              orElse: () => {'cluster': 0},
+            );
+            
+            return TableRow(
+              children: [
+                _buildDataTableCell('${index + 1}'),
+                _buildDataTableCell(raw['namaBarang']?.toString() ?? '-'),
+                _buildDataTableCell(_formatNumber(raw['jumlahMasuk'])),
+                _buildDataTableCell(_formatNumber(raw['jumlahKeluar'])),
+                _buildDataTableCell(_formatDecimal(raw['rataRataPemakaian'])),
+                _buildDataTableCell(_formatNumber(raw['frekuensiRestock'])),
+                _buildDataTableCell(_formatDecimal(raw['dayToStockOut'])),
+                _buildDataTableCell(_formatDecimal(raw['fluktuasiPemakaian'])),
+                _buildDataTableCell('C${itemResult['cluster']}'),
+              ],
+            );
+          }),
         ],
       ),
+    );
+  }
+  
+  Widget _buildDataTableHeader(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 8,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildDataTableCell(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 8),
+      ),
+    );
+  }
+  
+  String _formatNumber(dynamic value) {
+    if (value == null) return '0';
+    return (value as num).toInt().toString();
+  }
+  
+  String _formatDecimal(dynamic value) {
+    if (value == null) return '0.00';
+    return (value as num).toStringAsFixed(2);
+  }
+  
+  // Build recommendations section
+  Widget _buildRecommendationsSection(Map<String, dynamic> result) {
+    final recommendations = result['recommendations'] as List? ?? [];
+    
+    if (recommendations.isEmpty) {
+      return const Text(
+        'Tidak ada rekomendasi',
+        style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+      );
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: recommendations.asMap().entries.map((entry) {
+        final index = entry.key;
+        final rec = entry.value as Map<String, dynamic>;
+        
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${index + 1}. ',
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                child: Text(
+                  rec['recommendation']?.toString() ?? '-',
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
   

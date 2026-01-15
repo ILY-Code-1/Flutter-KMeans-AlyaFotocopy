@@ -247,13 +247,14 @@ class KMeansController extends GetxController {
 
       Get.snackbar(
         'Berhasil',
-        'Perhitungan K-Means selesai',
+        'Perhitungan K-Means selesai dan data berhasil disimpan',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.green.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
 
-      Get.toNamed('/form', arguments: {'resultId': resultId});
+      // Langsung ke success page tanpa form
+      Get.toNamed('/success', arguments: {'resultId': resultId});
     } catch (e) {
       Get.snackbar(
         'Error',

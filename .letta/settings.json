@@ -15,7 +15,9 @@
       "Write(**)",
       "Edit(lib\\app\\modules\\user_management\\views/**)",
       "Edit(lib\\app\\modules\\history\\views/**)",
-      "Edit(lib\\app\\modules\\history\\controllers/**)"
+      "Edit(lib\\app\\modules\\history\\controllers/**)",
+      "Edit(lib\\app\\modules\\kmeans\\controllers/**)",
+      "Edit(lib\\app\\modules\\success\\views/**)"
     ]
   }
 }

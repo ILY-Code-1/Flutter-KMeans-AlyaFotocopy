@@ -59,12 +59,12 @@ class SuccessView extends StatelessWidget {
                   ),
                   Gap.hLg,
                   Text(
-                    'Berhasil!',
+                    'Analisis Selesai!',
                     style: AppTextStyles.h3.copyWith(color: AppColors.success),
                   ),
                   Gap.hMd,
                   Text(
-                    'Data anda berhasil dikirim.\nHasil analisis akan kami kirim via email.\nTerimakasih, happy analysis🙏',
+                    'Hasil analisis K-Means Clustering berhasil disimpan.\nAnda dapat melihat riwayat analisis di menu admin.\nTerima kasih telah menggunakan sistem kami! 🙏',
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),

@@ -51,6 +51,10 @@ class HomeController extends GetxController {
     Get.toNamed('/kmeans');
   }
 
+  void navigateToUploadExcel() {
+    Get.toNamed(Routes.uploadExcel);
+  }
+
   void scrollToSection(GlobalKey key) {
     final context = key.currentContext;
     if (context != null) {

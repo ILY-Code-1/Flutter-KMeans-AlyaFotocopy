@@ -139,6 +139,12 @@ class HomeView extends GetView<HomeController> {
                 onPressed: controller.navigateToKMeans,
               ),
               PrimaryButton(
+                text: 'Upload Excel',
+                icon: Icons.upload_file,
+                onPressed: controller.navigateToUploadExcel,
+                backgroundColor: AppColors.success,
+              ),
+              PrimaryButton(
                 text: 'Cara Penggunaan',
                 isOutlined: true,
                 icon: Icons.help_outline,

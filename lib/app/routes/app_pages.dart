@@ -15,6 +15,8 @@ import '../modules/user_management/bindings/user_management_binding.dart';
 import '../modules/user_management/views/user_management_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
+import '../modules/upload_excel/bindings/upload_excel_binding.dart';
+import '../modules/upload_excel/views/upload_excel_view.dart';
 import '../middlewares/auth_middleware.dart';
 
 part 'app_routes.dart';
@@ -84,6 +86,14 @@ class AppPages {
       page: () => const HistoryView(),
       binding: HistoryBinding(),
       transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.uploadExcel,
+      page: () => const UploadExcelView(),
+      binding: UploadExcelBinding(),
+      transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthMiddleware()],
     ),

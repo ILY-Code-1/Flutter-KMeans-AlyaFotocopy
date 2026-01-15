@@ -17,7 +17,10 @@
       "Edit(lib\\app\\modules\\history\\views/**)",
       "Edit(lib\\app\\modules\\history\\controllers/**)",
       "Edit(lib\\app\\modules\\kmeans\\controllers/**)",
-      "Edit(lib\\app\\modules\\success\\views/**)"
+      "Edit(lib\\app\\modules\\success\\views/**)",
+      "Edit(**)",
+      "Bash(dir lib\\app\\modules)",
+      "Bash(flutter analyze)"
     ]
   }
 }

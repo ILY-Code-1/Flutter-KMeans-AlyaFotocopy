@@ -557,133 +557,185 @@ class HistoryController extends GetxController {
       isLoading.value = true;
       
       final pdf = pw.Document();
+      final rawData = result['rawData'] as List? ?? [];
+      final itemResults = result['itemResults'] as List? ?? [];
+      final recommendations = result['recommendations'] as List? ?? [];
       
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(32),
+          margin: const pw.EdgeInsets.all(40),
           build: (pw.Context context) {
             return [
-              // Header
+              // Header - Centered
+              pw.Center(
+                child: pw.Text(
+                  'LAPORAN HASIL ANALISIS K-MEANS CLUSTERING',
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ),
+              pw.Center(
+                child: pw.Text(
+                  'Klasifikasi Persediaan Barang by Alya Fotocopy',
+                  style: const pw.TextStyle(fontSize: 12),
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              
+              // Info Section
               pw.Container(
-                padding: const pw.EdgeInsets.all(20),
+                padding: const pw.EdgeInsets.all(10),
                 decoration: pw.BoxDecoration(
-                  color: PdfColors.blue100,
-                  borderRadius: pw.BorderRadius.circular(10),
+                  border: pw.Border.all(color: PdfColors.grey400),
+                  borderRadius: pw.BorderRadius.circular(5),
                 ),
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(
-                      'Hasil Analisis K-Means Clustering',
-                      style: pw.TextStyle(
-                        fontSize: 24,
-                        fontWeight: pw.FontWeight.bold,
-                        color: PdfColors.blue900,
-                      ),
+                    pw.Text('Informasi Laporan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Divider(),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Tanggal Analisis:'),
+                        pw.Text(formatTimestamp(result['timestamp'])),
+                      ],
                     ),
-                    pw.SizedBox(height: 8),
-                    pw.Text(
-                      'Tanggal: ${formatTimestamp(result['timestamp'])}',
-                      style: const pw.TextStyle(fontSize: 12),
+                    pw.SizedBox(height: 5),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Total Barang:'),
+                        pw.Text('${result['totalItems'] ?? 0} item'),
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Total Iterasi:'),
+                        pw.Text('${result['iterations'] ?? 0} iterasi'),
+                      ],
                     ),
                   ],
                 ),
               ),
-              pw.SizedBox(height: 24),
+              pw.SizedBox(height: 20),
               
-              // Summary
-              pw.Text(
-                'Ringkasan',
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 12),
-              pw.Table(
-                border: pw.TableBorder.all(color: PdfColors.grey300),
-                children: [
-                  _buildPdfTableRow('Total Items', '${result['totalItems'] ?? 0}'),
-                  _buildPdfTableRow('Iterasi', '${result['iterations'] ?? 0}'),
-                  _buildPdfTableRow('Jumlah Cluster', '${result['clusters']?.length ?? 0}'),
-                  if (result['userName'] != null)
-                    _buildPdfTableRow('Nama', result['userName']),
-                  if (result['userEmail'] != null)
-                    _buildPdfTableRow('Email', result['userEmail']),
-                ],
-              ),
-              pw.SizedBox(height: 24),
+              // Summary Section
+              pw.Text('Ringkasan Hasil Clustering', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 10),
+              _buildPdfClusterSummaryTable(itemResults),
+              pw.SizedBox(height: 20),
               
-              // Clusters
-              pw.Text(
-                'Detail Cluster',
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 12),
+              // Data Table
+              if (rawData.isNotEmpty && itemResults.isNotEmpty) ...[
+                pw.Text('Data Barang dan Hasil Clustering', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                _buildPdfDataTable(rawData, itemResults),
+                pw.SizedBox(height: 20),
+              ],
               
-              ...((result['clusters'] as List? ?? []).asMap().entries.map((entry) {
-                final index = entry.key;
-                final cluster = entry.value as Map<String, dynamic>;
-                final items = cluster['items'] as List? ?? [];
+              // Cluster Details
+              pw.Text('Detail per Cluster', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 10),
+              
+              ...itemResults.fold<Map<int, List<Map<String, dynamic>>>>(
+                {},
+                (map, item) {
+                  final cluster = item['cluster'] as int;
+                  if (!map.containsKey(cluster)) {
+                    map[cluster] = [];
+                  }
+                  map[cluster]!.add(item as Map<String, dynamic>);
+                  return map;
+                },
+              ).entries.map((entry) {
+                final clusterNum = entry.key;
+                final items = entry.value;
+                
+                String title;
+                PdfColor bgColor;
+                
+                switch (clusterNum) {
+                  case 1:
+                    title = 'Cluster 1 (C1): Barang Cepat Habis';
+                    bgColor = PdfColors.red100;
+                    break;
+                  case 2:
+                    title = 'Cluster 2 (C2): Barang Kebutuhan Normal';
+                    bgColor = PdfColors.yellow100;
+                    break;
+                  case 3:
+                    title = 'Cluster 3 (C3): Barang Jarang Terpakai';
+                    bgColor = PdfColors.green100;
+                    break;
+                  default:
+                    title = 'Cluster $clusterNum';
+                    bgColor = PdfColors.grey200;
+                }
                 
                 return pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Container(
-                      padding: const pw.EdgeInsets.all(12),
+                      padding: const pw.EdgeInsets.all(10),
                       decoration: pw.BoxDecoration(
-                        color: PdfColors.grey200,
-                        borderRadius: pw.BorderRadius.circular(8),
+                        color: bgColor,
+                        borderRadius: pw.BorderRadius.circular(5),
                       ),
-                      child: pw.Row(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
+                          pw.Text(title, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                          pw.SizedBox(height: 5),
                           pw.Text(
-                            cluster['label'] ?? 'Cluster ${index + 1}',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          pw.SizedBox(width: 12),
-                          pw.Text(
-                            '(${items.length} items)',
-                            style: const pw.TextStyle(fontSize: 12),
+                            'Barang: ${items.map((e) => e['namaBarang']).join(', ')}',
+                            style: const pw.TextStyle(fontSize: 10),
                           ),
                         ],
                       ),
                     ),
-                    pw.SizedBox(height: 8),
-                    ...items.map((item) {
-                      return pw.Padding(
-                        padding: const pw.EdgeInsets.only(left: 16, bottom: 4),
-                        child: pw.Row(
-                          children: [
-                            pw.Container(
-                              width: 6,
-                              height: 6,
-                              decoration: const pw.BoxDecoration(
-                                color: PdfColors.blue,
-                                shape: pw.BoxShape.circle,
-                              ),
-                            ),
-                            pw.SizedBox(width: 8),
-                            pw.Text(
-                              item['name'] ?? '-',
-                              style: const pw.TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    pw.SizedBox(height: 16),
+                    pw.SizedBox(height: 10),
                   ],
                 );
-              }).toList()),
+              }).toList(),
+              
+              // Recommendations
+              if (recommendations.isNotEmpty) ...[
+                pw.Text('Rekomendasi', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                ...recommendations.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final rec = entry.value as Map<String, dynamic>;
+                  return pw.Padding(
+                    padding: const pw.EdgeInsets.only(bottom: 5),
+                    child: pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('${index + 1}. ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.Expanded(
+                          child: pw.Text(rec['recommendation']?.toString() ?? '-', style: const pw.TextStyle(fontSize: 11)),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ],
             ];
+          },
+          footer: (pw.Context context) {
+            return pw.Container(
+              alignment: pw.Alignment.centerRight,
+              margin: const pw.EdgeInsets.only(top: 10),
+              child: pw.Text(
+                'Halaman ${context.pageNumber} dari ${context.pagesCount}',
+                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+              ),
+            );
           },
         ),
       );
@@ -714,23 +766,117 @@ class HistoryController extends GetxController {
     }
   }
   
-  pw.TableRow _buildPdfTableRow(String label, String value) {
-    return pw.TableRow(
+  // Build cluster summary table for PDF
+  pw.Widget _buildPdfClusterSummaryTable(List itemResults) {
+    final cluster1Count = itemResults.where((item) => item['cluster'] == 1).length;
+    final cluster2Count = itemResults.where((item) => item['cluster'] == 2).length;
+    final cluster3Count = itemResults.where((item) => item['cluster'] == 3).length;
+    
+    return pw.Table(
+      border: pw.TableBorder.all(color: PdfColors.grey400),
       children: [
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8),
-          child: pw.Text(
-            label,
-            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-          ),
+        pw.TableRow(
+          decoration: const pw.BoxDecoration(color: PdfColors.grey200),
+          children: [
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(5),
+              child: pw.Text('Cluster', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(5),
+              child: pw.Text('Kategori', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(5),
+              child: pw.Text('Jumlah Barang', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            ),
+          ],
         ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8),
-          child: pw.Text(value),
-        ),
+        _buildPdfSummaryRow('C1', 'Barang Cepat Habis', '$cluster1Count item'),
+        _buildPdfSummaryRow('C2', 'Barang Kebutuhan Normal', '$cluster2Count item'),
+        _buildPdfSummaryRow('C3', 'Barang Jarang Terpakai', '$cluster3Count item'),
       ],
     );
   }
+  
+  pw.TableRow _buildPdfSummaryRow(String cluster, String category, String count) {
+    return pw.TableRow(
+      children: [
+        pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(cluster)),
+        pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(category)),
+        pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(count)),
+      ],
+    );
+  }
+  
+  // Build data table for PDF
+  pw.Widget _buildPdfDataTable(List rawData, List itemResults) {
+    return pw.Table(
+      border: pw.TableBorder.all(color: PdfColors.grey400),
+      columnWidths: {
+        0: const pw.FlexColumnWidth(0.5),
+        1: const pw.FlexColumnWidth(2),
+        2: const pw.FlexColumnWidth(1),
+        3: const pw.FlexColumnWidth(1),
+        4: const pw.FlexColumnWidth(1),
+        5: const pw.FlexColumnWidth(1),
+        6: const pw.FlexColumnWidth(1),
+        7: const pw.FlexColumnWidth(1),
+        8: const pw.FlexColumnWidth(0.8),
+      },
+      children: [
+        pw.TableRow(
+          decoration: const pw.BoxDecoration(color: PdfColors.grey200),
+          children: [
+            _buildPdfTableHeader('No'),
+            _buildPdfTableHeader('Nama Barang'),
+            _buildPdfTableHeader('Jml Masuk'),
+            _buildPdfTableHeader('Jml Keluar'),
+            _buildPdfTableHeader('Rata2 Pakai'),
+            _buildPdfTableHeader('Frek Restock'),
+            _buildPdfTableHeader('Est. Habis'),
+            _buildPdfTableHeader('Fluktuasi'),
+            _buildPdfTableHeader('Cluster'),
+          ],
+        ),
+        ...List.generate(rawData.length, (index) {
+          final raw = rawData[index] as Map<String, dynamic>;
+          final result = itemResults.firstWhere(
+            (r) => r['itemId'] == raw['id'],
+            orElse: () => {'cluster': 0},
+          );
+          return pw.TableRow(
+            children: [
+              _buildPdfTableCell('${index + 1}'),
+              _buildPdfTableCell(raw['namaBarang']?.toString() ?? '-'),
+              _buildPdfTableCell(_formatNumber(raw['jumlahMasuk'])),
+              _buildPdfTableCell(_formatNumber(raw['jumlahKeluar'])),
+              _buildPdfTableCell(_formatDecimal(raw['rataRataPemakaian'])),
+              _buildPdfTableCell(_formatNumber(raw['frekuensiRestock'])),
+              _buildPdfTableCell(_formatDecimal(raw['dayToStockOut'])),
+              _buildPdfTableCell(_formatDecimal(raw['fluktuasiPemakaian'])),
+              _buildPdfTableCell('C${result['cluster']}'),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+  
+  pw.Widget _buildPdfTableHeader(String text) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.all(4),
+      child: pw.Text(text, style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+    );
+  }
+  
+  pw.Widget _buildPdfTableCell(String text) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.all(4),
+      child: pw.Text(text, style: const pw.TextStyle(fontSize: 8)),
+    );
+  }
+
   
   // Delete result
   void deleteResult(String resultId, String timestamp) {

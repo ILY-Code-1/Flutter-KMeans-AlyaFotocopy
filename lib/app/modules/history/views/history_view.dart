@@ -18,11 +18,7 @@ class HistoryView extends GetView<HistoryController> {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.history,
-                color: Colors.white,
-                size: 24,
-              ),
+              child: const Icon(Icons.history, color: Colors.white, size: 24),
             ),
             const SizedBox(width: 12),
             const Text(
@@ -30,6 +26,7 @@ class HistoryView extends GetView<HistoryController> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
+                color: Colors.white,
               ),
             ),
           ],
@@ -57,21 +54,16 @@ class HistoryView extends GetView<HistoryController> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              AppColors.softBlue.withOpacity(0.3),
-              Colors.white,
-            ],
+            colors: [AppColors.softBlue.withOpacity(0.3), Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: Obx(() {
           if (controller.isLoading.value && controller.results.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (controller.results.isEmpty) {
             return Center(
               child: Column(
@@ -115,7 +107,7 @@ class HistoryView extends GetView<HistoryController> {
               ),
             );
           }
-          
+
           return Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -177,10 +169,11 @@ class HistoryView extends GetView<HistoryController> {
                                         const SizedBox(width: 6),
                                         Text(
                                           'Total: ${controller.results.length} analisis',
-                                          style: AppTextStyles.bodyMedium.copyWith(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          style: AppTextStyles.bodyMedium
+                                              .copyWith(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -203,17 +196,17 @@ class HistoryView extends GetView<HistoryController> {
       ),
     );
   }
-  
+
   Widget _buildResultsTable(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    
+
     if (isMobile) {
       return _buildResultCards();
     } else {
       return _buildDataTable();
     }
   }
-  
+
   Widget _buildDataTable() {
     return Container(
       width: double.infinity,
@@ -288,11 +281,7 @@ class HistoryView extends GetView<HistoryController> {
               DataColumn(
                 label: Row(
                   children: [
-                    Icon(
-                      Icons.refresh,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
+                    Icon(Icons.refresh, size: 18, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
                       'Iterasi',
@@ -307,11 +296,7 @@ class HistoryView extends GetView<HistoryController> {
               DataColumn(
                 label: Row(
                   children: [
-                    Icon(
-                      Icons.group_work,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
+                    Icon(Icons.group_work, size: 18, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
                       'Clusters',
@@ -346,16 +331,16 @@ class HistoryView extends GetView<HistoryController> {
             rows: controller.results.asMap().entries.map((entry) {
               final index = entry.key;
               final result = entry.value;
-              
+
               return DataRow(
-                color: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
-                    if (index.isEven) {
-                      return AppColors.softBlue.withOpacity(0.3);
-                    }
-                    return Colors.white;
-                  },
-                ),
+                color: WidgetStateProperty.resolveWith<Color>((
+                  Set<WidgetState> states,
+                ) {
+                  if (index.isEven) {
+                    return AppColors.softBlue.withOpacity(0.3);
+                  }
+                  return Colors.white;
+                }),
                 cells: [
                   DataCell(
                     Row(
@@ -420,7 +405,10 @@ class HistoryView extends GetView<HistoryController> {
                       ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.green.shade400, Colors.green.shade600],
+                          colors: [
+                            Colors.green.shade400,
+                            Colors.green.shade600,
+                          ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
@@ -449,7 +437,10 @@ class HistoryView extends GetView<HistoryController> {
                       ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.purple.shade400, Colors.purple.shade600],
+                          colors: [
+                            Colors.purple.shade400,
+                            Colors.purple.shade600,
+                          ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
@@ -483,7 +474,8 @@ class HistoryView extends GetView<HistoryController> {
                             icon: const Icon(Icons.visibility_outlined),
                             color: Colors.green.shade700,
                             tooltip: 'Detail',
-                            onPressed: () => controller.showDetailDialog(result),
+                            onPressed: () =>
+                                controller.showDetailDialog(result),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -526,7 +518,7 @@ class HistoryView extends GetView<HistoryController> {
       ),
     );
   }
-  
+
   Widget _buildResultCards() {
     return Container(
       width: double.infinity,
@@ -551,18 +543,12 @@ class HistoryView extends GetView<HistoryController> {
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.white,
-                  AppColors.softBlue.withOpacity(0.3),
-                ],
+                colors: [Colors.white, AppColors.softBlue.withOpacity(0.3)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.border,
-                width: 1,
-              ),
+              border: Border.all(color: AppColors.border, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withOpacity(0.05),
@@ -691,21 +677,16 @@ class HistoryView extends GetView<HistoryController> {
       ),
     );
   }
-  
+
   Widget _buildMobileBadge(String label, Color color, IconData icon) {
     // Create gradient colors manually since Color doesn't have shade property
     final Color lightColor = Color.lerp(color, Colors.white, 0.2)!;
     final Color darkColor = Color.lerp(color, Colors.black, 0.2)!;
-    
+
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [lightColor, darkColor],
-        ),
+        gradient: LinearGradient(colors: [lightColor, darkColor]),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../themes/themes.dart';
 import '../controllers/user_management_controller.dart';
+import '../../admin_dashboard/widgets/admin_drawer.dart';
 
 class UserManagementView extends GetView<UserManagementController> {
   const UserManagementView({super.key});
@@ -9,6 +10,7 @@ class UserManagementView extends GetView<UserManagementController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/user-management'),
       appBar: AppBar(
         title: Row(
           children: [

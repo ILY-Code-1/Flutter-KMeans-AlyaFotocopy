@@ -89,7 +89,11 @@ class LoginView extends GetView<LoginController> {
             ],
           ),
           child: const Center(
-            child: Icon(Icons.analytics_rounded, color: Colors.white, size: 32),
+            child: Image(
+              image: AssetImage('assets/images/logo.png'),
+              width: 32,
+              height: 32,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.md),

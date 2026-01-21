@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../themes/themes.dart';
 import '../controllers/history_controller.dart';
+import '../../admin_dashboard/widgets/admin_drawer.dart';
 
 class HistoryView extends GetView<HistoryController> {
   const HistoryView({super.key});
@@ -9,6 +10,7 @@ class HistoryView extends GetView<HistoryController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/history'),
       appBar: AppBar(
         title: Row(
           children: [

@@ -8,32 +8,31 @@ import 'package:printing/printing.dart';
 
 class HistoryController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   final isLoading = false.obs;
   final results = <Map<String, dynamic>>[].obs;
-  
+
   @override
   void onInit() {
     super.onInit();
     fetchResults();
   }
-  
+
   // Fetch semua hasil analisis K-Means dari Firebase
   Future<void> fetchResults() async {
     try {
       isLoading.value = true;
-      
+
       final querySnapshot = await _firestore
           .collection('kmeans_results')
           .orderBy('timestamp', descending: true)
           .get();
-      
+
       results.value = querySnapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
-      
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -46,12 +45,12 @@ class HistoryController extends GetxController {
       isLoading.value = false;
     }
   }
-  
+
   // Format timestamp ke string yang readable
   String formatTimestamp(dynamic timestamp) {
     try {
       if (timestamp == null) return '-';
-      
+
       DateTime dateTime;
       if (timestamp is Timestamp) {
         dateTime = timestamp.toDate();
@@ -62,20 +61,18 @@ class HistoryController extends GetxController {
       } else {
         return '-';
       }
-      
+
       return DateFormat('dd MMM yyyy, HH:mm').format(dateTime);
     } catch (e) {
       return '-';
     }
   }
-  
+
   // Show detail dialog
   void showDetailDialog(Map<String, dynamic> result) {
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           width: 800,
           constraints: const BoxConstraints(maxHeight: 700),
@@ -99,7 +96,7 @@ class HistoryController extends GetxController {
                   ),
                 ),
               ),
-              
+
               // Content - PDF-like layout
               Expanded(
                 child: Container(
@@ -138,7 +135,7 @@ class HistoryController extends GetxController {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Info Section - Like PDF
                         Container(
                           padding: const EdgeInsets.all(10),
@@ -154,16 +151,25 @@ class HistoryController extends GetxController {
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               const Divider(),
-                              _buildInfoRow('Tanggal Analisis:', formatTimestamp(result['timestamp'])),
+                              _buildInfoRow(
+                                'Tanggal Analisis:',
+                                formatTimestamp(result['timestamp']),
+                              ),
                               const SizedBox(height: 5),
-                              _buildInfoRow('Total Barang:', '${result['totalItems'] ?? 0} item'),
+                              _buildInfoRow(
+                                'Total Barang:',
+                                '${result['totalItems'] ?? 0} item',
+                              ),
                               const SizedBox(height: 5),
-                              _buildInfoRow('Total Iterasi:', '${result['iterations'] ?? 0} iterasi'),
+                              _buildInfoRow(
+                                'Total Iterasi:',
+                                '${result['iterations'] ?? 0} iterasi',
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Summary Section - Like PDF
                         const Text(
                           'Ringkasan Hasil Clustering',
@@ -174,13 +180,14 @@ class HistoryController extends GetxController {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        
+
                         // Summary Table - Like PDF
                         _buildClusterSummaryTable(result),
                         const SizedBox(height: 20),
-                        
+
                         // Data Table - Like PDF
-                        if (result['rawData'] != null && result['itemResults'] != null) ...[
+                        if (result['rawData'] != null &&
+                            result['itemResults'] != null) ...[
                           const Text(
                             'Data Barang dan Hasil Clustering',
                             style: TextStyle(
@@ -193,7 +200,7 @@ class HistoryController extends GetxController {
                           _buildDataTable(result),
                           const SizedBox(height: 20),
                         ],
-                        
+
                         // Clusters Detail - Like PDF
                         const Text(
                           'Detail per Cluster',
@@ -204,74 +211,83 @@ class HistoryController extends GetxController {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        
-                        ...((result['itemResults'] as List? ?? []).fold<Map<int, List<Map<String, dynamic>>>>(
-                          {},
-                          (map, item) {
-                            final cluster = item['cluster'] as int;
-                            if (!map.containsKey(cluster)) {
-                              map[cluster] = [];
-                            }
-                            map[cluster]!.add(item as Map<String, dynamic>);
-                            return map;
-                          },
-                        ).entries.map((entry) {
-                          final clusterNum = entry.key;
-                          final items = entry.value;
-                          
-                          String title;
-                          Color bgColor;
-                          
-                          switch (clusterNum) {
-                            case 1:
-                              title = 'Cluster 1 (C1): Barang Cepat Habis';
-                              bgColor = const Color(0xFFFFCDD2); // red100
-                              break;
-                            case 2:
-                              title = 'Cluster 2 (C2): Barang Kebutuhan Normal';
-                              bgColor = const Color(0xFFFFF9C4); // yellow100
-                              break;
-                            case 3:
-                              title = 'Cluster 3 (C3): Barang Jarang Terpakai';
-                              bgColor = const Color(0xFFC8E6C9); // green100
-                              break;
-                            default:
-                              title = 'Cluster $clusterNum';
-                              bgColor = Colors.grey.shade200;
-                          }
-                          
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: bgColor,
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      title,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
+
+                        ...((result['itemResults'] as List? ?? [])
+                            .fold<Map<int, List<Map<String, dynamic>>>>({}, (
+                              map,
+                              item,
+                            ) {
+                              final cluster = item['cluster'] as int;
+                              if (!map.containsKey(cluster)) {
+                                map[cluster] = [];
+                              }
+                              map[cluster]!.add(item as Map<String, dynamic>);
+                              return map;
+                            })
+                            .entries
+                            .map((entry) {
+                              final clusterNum = entry.key;
+                              final items = entry.value;
+
+                              String title;
+                              Color bgColor;
+
+                              switch (clusterNum) {
+                                case 1:
+                                  title = 'Cluster 1 (C1): Barang Cepat Habis';
+                                  bgColor = const Color(0xFFFFCDD2); // red100
+                                  break;
+                                case 2:
+                                  title =
+                                      'Cluster 2 (C2): Barang Kebutuhan Normal';
+                                  bgColor = const Color(
+                                    0xFFFFF9C4,
+                                  ); // yellow100
+                                  break;
+                                case 3:
+                                  title =
+                                      'Cluster 3 (C3): Barang Jarang Terpakai';
+                                  bgColor = const Color(0xFFC8E6C9); // green100
+                                  break;
+                                default:
+                                  title = 'Cluster $clusterNum';
+                                  bgColor = Colors.grey.shade200;
+                              }
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: bgColor,
+                                      borderRadius: BorderRadius.circular(5),
                                     ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      'Barang: ${items.map((e) => e['namaBarang']).join(', ')}',
-                                      style: const TextStyle(fontSize: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          title,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          'Barang: ${items.map((e) => e['namaBarang']).join(', ')}',
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                            ],
-                          );
-                        }).toList()),
-                        
+                                  ),
+                                  const SizedBox(height: 10),
+                                ],
+                              );
+                            })
+                            .toList()),
+
                         // Recommendations - Like PDF
                         if (result['recommendations'] != null) ...[
                           const Text(
@@ -290,15 +306,13 @@ class HistoryController extends GetxController {
                   ),
                 ),
               ),
-              
+
               // Actions
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50,
-                  border: Border(
-                    top: BorderSide(color: Colors.grey.shade300),
-                  ),
+                  border: Border(top: BorderSide(color: Colors.grey.shade300)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -341,7 +355,7 @@ class HistoryController extends GetxController {
       barrierDismissible: true,
     );
   }
-  
+
   // Build info row for detail view
   Widget _buildInfoRow(String label, String value) {
     return Row(
@@ -352,14 +366,20 @@ class HistoryController extends GetxController {
       ],
     );
   }
-  
+
   // Build cluster summary table
   Widget _buildClusterSummaryTable(Map<String, dynamic> result) {
     final itemResults = result['itemResults'] as List? ?? [];
-    final cluster1Count = itemResults.where((item) => item['cluster'] == 1).length;
-    final cluster2Count = itemResults.where((item) => item['cluster'] == 2).length;
-    final cluster3Count = itemResults.where((item) => item['cluster'] == 3).length;
-    
+    final cluster1Count = itemResults
+        .where((item) => item['cluster'] == 1)
+        .length;
+    final cluster2Count = itemResults
+        .where((item) => item['cluster'] == 2)
+        .length;
+    final cluster3Count = itemResults
+        .where((item) => item['cluster'] == 3)
+        .length;
+
     return Table(
       border: TableBorder.all(color: Colors.grey.shade400),
       children: [
@@ -372,12 +392,16 @@ class HistoryController extends GetxController {
           ],
         ),
         _buildSummaryRow('C1', 'Barang Cepat Habis', '$cluster1Count item'),
-        _buildSummaryRow('C2', 'Barang Kebutuhan Normal', '$cluster2Count item'),
+        _buildSummaryRow(
+          'C2',
+          'Barang Kebutuhan Normal',
+          '$cluster2Count item',
+        ),
         _buildSummaryRow('C3', 'Barang Jarang Terpakai', '$cluster3Count item'),
       ],
     );
   }
-  
+
   Widget _buildTableHeader(String text) {
     return Padding(
       padding: const EdgeInsets.all(5),
@@ -387,7 +411,7 @@ class HistoryController extends GetxController {
       ),
     );
   }
-  
+
   TableRow _buildSummaryRow(String cluster, String category, String count) {
     return TableRow(
       children: [
@@ -406,12 +430,12 @@ class HistoryController extends GetxController {
       ],
     );
   }
-  
+
   // Build data table
   Widget _buildDataTable(Map<String, dynamic> result) {
     final rawData = result['rawData'] as List? ?? [];
     final itemResults = result['itemResults'] as List? ?? [];
-    
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Table(
@@ -448,7 +472,7 @@ class HistoryController extends GetxController {
               (r) => r['itemId'] == raw['id'],
               orElse: () => {'cluster': 0},
             );
-            
+
             return TableRow(
               children: [
                 _buildDataTableCell('${index + 1}'),
@@ -467,57 +491,51 @@ class HistoryController extends GetxController {
       ),
     );
   }
-  
+
   Widget _buildDataTableHeader(String text) {
     return Padding(
       padding: const EdgeInsets.all(4),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 8,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
       ),
     );
   }
-  
+
   Widget _buildDataTableCell(String text) {
     return Padding(
       padding: const EdgeInsets.all(4),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 8),
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 8)),
     );
   }
-  
+
   String _formatNumber(dynamic value) {
     if (value == null) return '0';
     return (value as num).toInt().toString();
   }
-  
+
   String _formatDecimal(dynamic value) {
     if (value == null) return '0.00';
     return (value as num).toStringAsFixed(2);
   }
-  
+
   // Build recommendations section
   Widget _buildRecommendationsSection(Map<String, dynamic> result) {
     final recommendations = result['recommendations'] as List? ?? [];
-    
+
     if (recommendations.isEmpty) {
       return const Text(
         'Tidak ada rekomendasi',
         style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
       );
     }
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: recommendations.asMap().entries.map((entry) {
         final index = entry.key;
         final rec = entry.value as Map<String, dynamic>;
-        
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Row(
@@ -525,7 +543,10 @@ class HistoryController extends GetxController {
             children: [
               Text(
                 '${index + 1}. ',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Expanded(
                 child: Text(
@@ -539,28 +560,17 @@ class HistoryController extends GetxController {
       }).toList(),
     );
   }
-  
-  Color _getClusterColor(int index) {
-    final colors = [
-      const Color(0xFF4CAF50), // Green
-      const Color(0xFFF44336), // Red
-      const Color(0xFF2196F3), // Blue
-      const Color(0xFFFF9800), // Orange
-      const Color(0xFF9C27B0), // Purple
-    ];
-    return colors[index % colors.length];
-  }
-  
+
   // Download PDF
   Future<void> downloadPDF(Map<String, dynamic> result) async {
     try {
       isLoading.value = true;
-      
+
       final pdf = pw.Document();
       final rawData = result['rawData'] as List? ?? [];
       final itemResults = result['itemResults'] as List? ?? [];
       final recommendations = result['recommendations'] as List? ?? [];
-      
+
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -584,7 +594,7 @@ class HistoryController extends GetxController {
                 ),
               ),
               pw.SizedBox(height: 20),
-              
+
               // Info Section
               pw.Container(
                 padding: const pw.EdgeInsets.all(10),
@@ -595,7 +605,10 @@ class HistoryController extends GetxController {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Informasi Laporan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Text(
+                      'Informasi Laporan',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                     pw.Divider(),
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -624,89 +637,119 @@ class HistoryController extends GetxController {
                 ),
               ),
               pw.SizedBox(height: 20),
-              
+
               // Summary Section
-              pw.Text('Ringkasan Hasil Clustering', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                'Ringkasan Hasil Clustering',
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
               pw.SizedBox(height: 10),
               _buildPdfClusterSummaryTable(itemResults),
               pw.SizedBox(height: 20),
-              
+
               // Data Table
               if (rawData.isNotEmpty && itemResults.isNotEmpty) ...[
-                pw.Text('Data Barang dan Hasil Clustering', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  'Data Barang dan Hasil Clustering',
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
                 pw.SizedBox(height: 10),
                 _buildPdfDataTable(rawData, itemResults),
                 pw.SizedBox(height: 20),
               ],
-              
+
               // Cluster Details
-              pw.Text('Detail per Cluster', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                'Detail per Cluster',
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
               pw.SizedBox(height: 10),
-              
-              ...itemResults.fold<Map<int, List<Map<String, dynamic>>>>(
-                {},
-                (map, item) {
-                  final cluster = item['cluster'] as int;
-                  if (!map.containsKey(cluster)) {
-                    map[cluster] = [];
-                  }
-                  map[cluster]!.add(item as Map<String, dynamic>);
-                  return map;
-                },
-              ).entries.map((entry) {
-                final clusterNum = entry.key;
-                final items = entry.value;
-                
-                String title;
-                PdfColor bgColor;
-                
-                switch (clusterNum) {
-                  case 1:
-                    title = 'Cluster 1 (C1): Barang Cepat Habis';
-                    bgColor = PdfColors.red100;
-                    break;
-                  case 2:
-                    title = 'Cluster 2 (C2): Barang Kebutuhan Normal';
-                    bgColor = PdfColors.yellow100;
-                    break;
-                  case 3:
-                    title = 'Cluster 3 (C3): Barang Jarang Terpakai';
-                    bgColor = PdfColors.green100;
-                    break;
-                  default:
-                    title = 'Cluster $clusterNum';
-                    bgColor = PdfColors.grey200;
-                }
-                
-                return pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(10),
-                      decoration: pw.BoxDecoration(
-                        color: bgColor,
-                        borderRadius: pw.BorderRadius.circular(5),
-                      ),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text(title, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                          pw.SizedBox(height: 5),
-                          pw.Text(
-                            'Barang: ${items.map((e) => e['namaBarang']).join(', ')}',
-                            style: const pw.TextStyle(fontSize: 10),
+
+              ...itemResults
+                  .fold<Map<int, List<Map<String, dynamic>>>>({}, (map, item) {
+                    final cluster = item['cluster'] as int;
+                    if (!map.containsKey(cluster)) {
+                      map[cluster] = [];
+                    }
+                    map[cluster]!.add(item as Map<String, dynamic>);
+                    return map;
+                  })
+                  .entries
+                  .map((entry) {
+                    final clusterNum = entry.key;
+                    final items = entry.value;
+
+                    String title;
+                    PdfColor bgColor;
+
+                    switch (clusterNum) {
+                      case 1:
+                        title = 'Cluster 1 (C1): Barang Cepat Habis';
+                        bgColor = PdfColors.red100;
+                        break;
+                      case 2:
+                        title = 'Cluster 2 (C2): Barang Kebutuhan Normal';
+                        bgColor = PdfColors.yellow100;
+                        break;
+                      case 3:
+                        title = 'Cluster 3 (C3): Barang Jarang Terpakai';
+                        bgColor = PdfColors.green100;
+                        break;
+                      default:
+                        title = 'Cluster $clusterNum';
+                        bgColor = PdfColors.grey200;
+                    }
+
+                    return pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(10),
+                          decoration: pw.BoxDecoration(
+                            color: bgColor,
+                            borderRadius: pw.BorderRadius.circular(5),
                           ),
-                        ],
-                      ),
-                    ),
-                    pw.SizedBox(height: 10),
-                  ],
-                );
-              }).toList(),
-              
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Text(
+                                title,
+                                style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                              ),
+                              pw.SizedBox(height: 5),
+                              pw.Text(
+                                'Barang: ${items.map((e) => e['namaBarang']).join(', ')}',
+                                style: const pw.TextStyle(fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        ),
+                        pw.SizedBox(height: 10),
+                      ],
+                    );
+                  })
+                  .toList(),
+
               // Recommendations
               if (recommendations.isNotEmpty) ...[
-                pw.Text('Rekomendasi', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  'Rekomendasi',
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
                 pw.SizedBox(height: 10),
                 ...recommendations.asMap().entries.map((entry) {
                   final index = entry.key;
@@ -716,9 +759,15 @@ class HistoryController extends GetxController {
                     child: pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('${index + 1}. ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.Text(
+                          '${index + 1}. ',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                        ),
                         pw.Expanded(
-                          child: pw.Text(rec['recommendation']?.toString() ?? '-', style: const pw.TextStyle(fontSize: 11)),
+                          child: pw.Text(
+                            rec['recommendation']?.toString() ?? '-',
+                            style: const pw.TextStyle(fontSize: 11),
+                          ),
                         ),
                       ],
                     ),
@@ -733,18 +782,21 @@ class HistoryController extends GetxController {
               margin: const pw.EdgeInsets.only(top: 10),
               child: pw.Text(
                 'Halaman ${context.pageNumber} dari ${context.pagesCount}',
-                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                style: const pw.TextStyle(
+                  fontSize: 10,
+                  color: PdfColors.grey600,
+                ),
               ),
             );
           },
         ),
       );
-      
+
       // Print/Save PDF
       await Printing.layoutPdf(
         onLayout: (PdfPageFormat format) async => pdf.save(),
       );
-      
+
       Get.snackbar(
         'Berhasil',
         'PDF berhasil diunduh',
@@ -752,7 +804,6 @@ class HistoryController extends GetxController {
         colorText: Colors.green.shade900,
         snackPosition: SnackPosition.TOP,
       );
-      
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -765,13 +816,19 @@ class HistoryController extends GetxController {
       isLoading.value = false;
     }
   }
-  
+
   // Build cluster summary table for PDF
   pw.Widget _buildPdfClusterSummaryTable(List itemResults) {
-    final cluster1Count = itemResults.where((item) => item['cluster'] == 1).length;
-    final cluster2Count = itemResults.where((item) => item['cluster'] == 2).length;
-    final cluster3Count = itemResults.where((item) => item['cluster'] == 3).length;
-    
+    final cluster1Count = itemResults
+        .where((item) => item['cluster'] == 1)
+        .length;
+    final cluster2Count = itemResults
+        .where((item) => item['cluster'] == 2)
+        .length;
+    final cluster3Count = itemResults
+        .where((item) => item['cluster'] == 3)
+        .length;
+
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey400),
       children: [
@@ -780,35 +837,62 @@ class HistoryController extends GetxController {
           children: [
             pw.Padding(
               padding: const pw.EdgeInsets.all(5),
-              child: pw.Text('Cluster', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              child: pw.Text(
+                'Cluster',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
             ),
             pw.Padding(
               padding: const pw.EdgeInsets.all(5),
-              child: pw.Text('Kategori', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              child: pw.Text(
+                'Kategori',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
             ),
             pw.Padding(
               padding: const pw.EdgeInsets.all(5),
-              child: pw.Text('Jumlah Barang', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              child: pw.Text(
+                'Jumlah Barang',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
             ),
           ],
         ),
         _buildPdfSummaryRow('C1', 'Barang Cepat Habis', '$cluster1Count item'),
-        _buildPdfSummaryRow('C2', 'Barang Kebutuhan Normal', '$cluster2Count item'),
-        _buildPdfSummaryRow('C3', 'Barang Jarang Terpakai', '$cluster3Count item'),
+        _buildPdfSummaryRow(
+          'C2',
+          'Barang Kebutuhan Normal',
+          '$cluster2Count item',
+        ),
+        _buildPdfSummaryRow(
+          'C3',
+          'Barang Jarang Terpakai',
+          '$cluster3Count item',
+        ),
       ],
     );
   }
-  
-  pw.TableRow _buildPdfSummaryRow(String cluster, String category, String count) {
+
+  pw.TableRow _buildPdfSummaryRow(
+    String cluster,
+    String category,
+    String count,
+  ) {
     return pw.TableRow(
       children: [
-        pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(cluster)),
-        pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(category)),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(5),
+          child: pw.Text(cluster),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(5),
+          child: pw.Text(category),
+        ),
         pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(count)),
       ],
     );
   }
-  
+
   // Build data table for PDF
   pw.Widget _buildPdfDataTable(List rawData, List itemResults) {
     return pw.Table(
@@ -862,14 +946,17 @@ class HistoryController extends GetxController {
       ],
     );
   }
-  
+
   pw.Widget _buildPdfTableHeader(String text) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(4),
-      child: pw.Text(text, style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+      ),
     );
   }
-  
+
   pw.Widget _buildPdfTableCell(String text) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(4),
@@ -877,14 +964,11 @@ class HistoryController extends GetxController {
     );
   }
 
-  
   // Delete result
   void deleteResult(String resultId, String timestamp) {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
             Icon(Icons.warning, color: Colors.red),
@@ -897,10 +981,7 @@ class HistoryController extends GetxController {
           style: const TextStyle(fontSize: 16),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
           ElevatedButton(
             onPressed: () async {
               Get.back(); // Close dialog
@@ -916,13 +997,13 @@ class HistoryController extends GetxController {
       ),
     );
   }
-  
+
   Future<void> _deleteResultConfirmed(String resultId) async {
     try {
       isLoading.value = true;
-      
+
       await _firestore.collection('kmeans_results').doc(resultId).delete();
-      
+
       Get.snackbar(
         'Berhasil',
         'Riwayat berhasil dihapus',
@@ -930,10 +1011,9 @@ class HistoryController extends GetxController {
         colorText: Colors.green.shade900,
         snackPosition: SnackPosition.TOP,
       );
-      
+
       // Refresh list
       await fetchResults();
-      
     } catch (e) {
       Get.snackbar(
         'Error',

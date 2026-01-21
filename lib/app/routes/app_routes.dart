@@ -12,4 +12,5 @@ abstract class Routes {
   static const userManagement = '/user-management';
   static const history = '/history';
   static const uploadExcel = '/upload-excel';
+  static const adminDashboard = '/admin-dashboard';
 }

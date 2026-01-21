@@ -1,3 +1,7 @@
 {
-  "lastAgent": "agent-fd34fd99-60d1-477e-b0bf-601efd7f325f"
+  "lastAgent": "agent-e95e60d0-0032-45d6-86d5-995e796c6695",
+  "lastSession": {
+    "agentId": "agent-e95e60d0-0032-45d6-86d5-995e796c6695",
+    "conversationId": "default"
+  }
 }

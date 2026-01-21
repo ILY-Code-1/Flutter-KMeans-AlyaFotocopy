@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../themes/themes.dart';
 import '../../../core/core.dart';
 import '../../../widgets/widgets.dart';
+import '../../../services/auth_service.dart';
 import '../controllers/guide_controller.dart';
 
 class GuideView extends GetView<GuideController> {
@@ -138,6 +139,13 @@ class GuideView extends GetView<GuideController> {
   }
 
   Widget _buildStartButton(BuildContext context) {
+    final authService = Get.find<AuthService>();
+    
+    // Jangan tampilkan tombol jika user adalah admin
+    if (authService.isAdmin) {
+      return const SizedBox.shrink();
+    }
+    
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 1000),
       tween: Tween(begin: 0.0, end: 1.0),

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../themes/themes.dart';
 import '../../../core/core.dart';
 import '../../../widgets/widgets.dart';
+import '../../../services/auth_service.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -88,6 +89,8 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _buildHeroContent(BuildContext context) {
+    final authService = Get.find<AuthService>();
+    
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 800),
       tween: Tween(begin: 0.0, end: 1.0),
@@ -133,17 +136,20 @@ class HomeView extends GetView<HomeController> {
                 ? WrapAlignment.center
                 : WrapAlignment.start,
             children: [
-              PrimaryButton(
-                text: 'Mulai Analisis',
-                icon: Icons.play_arrow,
-                onPressed: controller.navigateToKMeans,
-              ),
-              PrimaryButton(
-                text: 'Upload Excel',
-                icon: Icons.upload_file,
-                onPressed: controller.navigateToUploadExcel,
-                backgroundColor: AppColors.success,
-              ),
+              // Hanya tampilkan tombol ini jika bukan admin
+              if (!authService.isAdmin) ...[
+                PrimaryButton(
+                  text: 'Mulai Analisis',
+                  icon: Icons.play_arrow,
+                  onPressed: controller.navigateToKMeans,
+                ),
+                PrimaryButton(
+                  text: 'Upload Excel',
+                  icon: Icons.upload_file,
+                  onPressed: controller.navigateToUploadExcel,
+                  backgroundColor: AppColors.success,
+                ),
+              ],
               PrimaryButton(
                 text: 'Cara Penggunaan',
                 isOutlined: true,
@@ -320,6 +326,8 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _buildGuideSection(BuildContext context) {
+    final authService = Get.find<AuthService>();
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
       child: Column(
@@ -360,12 +368,15 @@ class HomeView extends GetView<HomeController> {
           ),
           Gap.hXl,
           _buildGuideSteps(context),
-          Gap.hXl,
-          PrimaryButton(
-            text: 'Mulai Sekarang',
-            icon: Icons.arrow_forward,
-            onPressed: controller.navigateToKMeans,
-          ),
+          // Hanya tampilkan tombol "Mulai Sekarang" jika bukan admin
+          if (!authService.isAdmin) ...[
+            Gap.hXl,
+            PrimaryButton(
+              text: 'Mulai Sekarang',
+              icon: Icons.arrow_forward,
+              onPressed: controller.navigateToKMeans,
+            ),
+          ],
         ],
       ),
     );

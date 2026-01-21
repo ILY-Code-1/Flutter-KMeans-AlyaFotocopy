@@ -82,9 +82,17 @@ class LoginController extends GetxController {
           duration: const Duration(seconds: 2),
         );
         
-        // Navigasi ke home dan hapus semua route sebelumnya
+        // Navigasi berdasarkan role user
         await Future.delayed(const Duration(milliseconds: 500));
-        Get.offAllNamed(Routes.home);
+        
+        // Cek role user
+        if (_authService.isAdmin) {
+          // Jika admin, arahkan ke dashboard admin
+          Get.offAllNamed(Routes.adminDashboard);
+        } else {
+          // Jika staff, arahkan ke home
+          Get.offAllNamed(Routes.home);
+        }
       } else {
         // Login gagal
         Get.snackbar(

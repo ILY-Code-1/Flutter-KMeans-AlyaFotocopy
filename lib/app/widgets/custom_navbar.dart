@@ -71,15 +71,17 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               ),
-              child: const Icon(Icons.analytics, color: AppColors.primary),
+              child: const Image(
+                image: AssetImage('assets/images/logo.png'),
+                width: 32,
+                height: 32,
+              ),
             ),
             const SizedBox(width: AppSpacing.sm),
             if (!isMobile || title != null)
               Text(
                 title ?? 'K-Means Alya Fotocopy',
-                style: AppTextStyles.h5.copyWith(
-                  fontSize: isMobile ? 16 : 20,
-                ),
+                style: AppTextStyles.h5.copyWith(fontSize: isMobile ? 16 : 20),
               ),
             const Spacer(),
             if (menuItems != null && !isMobile) ...[
@@ -98,10 +100,7 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     return menuItems!.map((item) {
-      return _NavMenuButton(
-        label: item.label,
-        onTap: item.onTap,
-      );
+      return _NavMenuButton(label: item.label, onTap: item.onTap);
     }).toList();
   }
 
@@ -127,10 +126,7 @@ class _NavMenuButton extends StatefulWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _NavMenuButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _NavMenuButton({required this.label, required this.onTap});
 
   @override
   State<_NavMenuButton> createState() => _NavMenuButtonState();
@@ -153,7 +149,9 @@ class _NavMenuButtonState extends State<_NavMenuButton> {
             vertical: AppSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: _isHovered ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+            color: _isHovered
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Text(

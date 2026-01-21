@@ -8,7 +8,7 @@ import '../../kmeans/controllers/kmeans_controller.dart';
 
 class UploadExcelController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   final isLoading = false.obs;
   final isProcessing = false.obs;
   final uploadedFileName = ''.obs;
@@ -26,10 +26,10 @@ class UploadExcelController extends GetxController {
       if (result != null && result.files.single.bytes != null) {
         isLoading.value = true;
         uploadedFileName.value = result.files.single.name;
-        
+
         // Parse Excel
         await _parseExcelFile(result.files.single.bytes!);
-        
+
         Get.snackbar(
           'Berhasil',
           'File Excel berhasil diupload dan diparse',
@@ -55,13 +55,13 @@ class UploadExcelController extends GetxController {
   Future<void> _parseExcelFile(List<int> bytes) async {
     try {
       items.clear();
-      
+
       final excel = Excel.decodeBytes(bytes);
-      
+
       // Ambil sheet pertama
       final sheetName = excel.tables.keys.first;
       final sheet = excel.tables[sheetName];
-      
+
       if (sheet == null) {
         throw Exception('Sheet tidak ditemukan');
       }
@@ -69,9 +69,9 @@ class UploadExcelController extends GetxController {
       // Skip header row (row 0), mulai dari row 1
       for (int i = 1; i < sheet.maxRows; i++) {
         final row = sheet.rows[i];
-        
+
         // Skip empty rows
-        if (row.every((cell) => cell == null || cell?.value == null)) {
+        if (row.every((cell) => cell == null || cell.value == null)) {
           continue;
         }
 
@@ -127,9 +127,9 @@ class UploadExcelController extends GetxController {
     if (index >= row.length) return '';
     final cell = row[index];
     if (cell == null || cell.value == null) return '';
-    
+
     final value = cell.value;
-    
+
     // Handle CellValue types from excel package
     if (value is TextCellValue) {
       // TextCellValue.value returns TextSpan, need to get text
@@ -144,7 +144,7 @@ class UploadExcelController extends GetxController {
     if (value is FormulaCellValue) {
       return value.formula;
     }
-    
+
     // Fallback to toString
     return value.toString();
   }
@@ -154,21 +154,21 @@ class UploadExcelController extends GetxController {
       print('  Index $index out of range (row length: ${row.length})');
       return 0.0;
     }
-    
+
     final cell = row[index];
     if (cell == null) {
       print('  Cell at index $index is null');
       return 0.0;
     }
-    
+
     final value = cell.value;
     if (value == null) {
       print('  Cell value at index $index is null');
       return 0.0;
     }
-    
+
     print('  Cell at index $index: type=${value.runtimeType}, value=$value');
-    
+
     // Handle different cell value types from excel package v4
     if (value is IntCellValue) {
       print('  Parsed as IntCellValue: ${value.value}');
@@ -191,7 +191,7 @@ class UploadExcelController extends GetxController {
       // Try to parse formula result if available
       return 0.0;
     }
-    
+
     // Try to parse toString() as last resort
     try {
       final stringValue = value.toString();
@@ -267,7 +267,11 @@ class UploadExcelController extends GetxController {
       clusterAssignments = _assignToClusters(normalizedData, centroids);
 
       // Calculate new centroids
-      final newCentroids = _calculateNewCentroids(normalizedData, clusterAssignments, 3);
+      final newCentroids = _calculateNewCentroids(
+        normalizedData,
+        clusterAssignments,
+        3,
+      );
 
       // Check convergence
       converged = _checkConvergence(centroids, newCentroids, threshold);
@@ -294,7 +298,7 @@ class UploadExcelController extends GetxController {
           clusterAnalysis['clusterMapping'],
         );
         int sortedCluster = clusterMapping[originalCluster.toString()]!;
-        
+
         return {
           'itemId': entry.value.id,
           'namaBarang': entry.value.namaBarang,
@@ -309,14 +313,18 @@ class UploadExcelController extends GetxController {
     if (items.isEmpty) return [];
 
     // Find min and max for each feature
-    final features = items.map((item) => [
-      item.jumlahMasuk,
-      item.jumlahKeluar,
-      item.rataRataPemakaian,
-      item.frekuensiRestock,
-      item.dayToStockOut,
-      item.fluktuasiPemakaian,
-    ]).toList();
+    final features = items
+        .map(
+          (item) => [
+            item.jumlahMasuk,
+            item.jumlahKeluar,
+            item.rataRataPemakaian,
+            item.frekuensiRestock,
+            item.dayToStockOut,
+            item.fluktuasiPemakaian,
+          ],
+        )
+        .toList();
 
     final numFeatures = 6;
     final mins = List<double>.filled(numFeatures, double.infinity);
@@ -354,7 +362,10 @@ class UploadExcelController extends GetxController {
     return centroids;
   }
 
-  List<int> _assignToClusters(List<List<double>> data, List<List<double>> centroids) {
+  List<int> _assignToClusters(
+    List<List<double>> data,
+    List<List<double>> centroids,
+  ) {
     return data.map((point) {
       int nearestCluster = 0;
       double minDistance = double.infinity;
@@ -435,7 +446,7 @@ class UploadExcelController extends GetxController {
     Map<String, int> clusterMapping = Map<String, int>.from(
       clusterAnalysis['clusterMapping'],
     );
-    
+
     List<Map<String, dynamic>> recommendations = [];
 
     for (int i = 0; i < items.length; i++) {

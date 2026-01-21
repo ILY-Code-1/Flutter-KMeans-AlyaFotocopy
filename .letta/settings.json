@@ -20,7 +20,13 @@
       "Edit(lib\\app\\modules\\success\\views/**)",
       "Edit(**)",
       "Bash(dir lib\\app\\modules)",
-      "Bash(flutter analyze)"
+      "Bash(flutter analyze)",
+      "Bash(cd lib/app/modules && mkdir -p admin_dashboard/bindings admin_dashboard/controllers admin_dashboard/views admin_dashboard/widgets)",
+      "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\bindings\" -Force)",
+      "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\controllers\" -Force)",
+      "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\views\" -Force)",
+      "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\widgets\" -Force)",
+      "Bash(mkdir \"lib\\app\\modules\\admin_dashboard\\bindings\" \"lib\\app\\modules\\admin_dashboard\\controllers\" \"lib\\app\\modules\\admin_dashboard\\views\" \"lib\\app\\modules\\admin_dashboard\\widgets\")"
     ]
   }
 }

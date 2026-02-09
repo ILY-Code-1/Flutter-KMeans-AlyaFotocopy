@@ -13,6 +13,8 @@ import '../modules/guide/bindings/guide_binding.dart';
 import '../modules/guide/views/guide_view.dart';
 import '../modules/user_management/bindings/user_management_binding.dart';
 import '../modules/user_management/views/user_management_view.dart';
+import '../modules/item_management/bindings/item_management_binding.dart';
+import '../modules/item_management/views/item_management_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
 import '../modules/upload_excel/bindings/upload_excel_binding.dart';
@@ -79,6 +81,14 @@ class AppPages {
       name: Routes.userManagement,
       page: () => const UserManagementView(),
       binding: UserManagementBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.itemManagement,
+      page: () => const ItemManagementView(),
+      binding: ItemManagementBinding(),
       transition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthMiddleware()],

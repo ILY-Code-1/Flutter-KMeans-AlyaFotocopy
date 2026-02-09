@@ -112,6 +112,17 @@ class AdminDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerMenuItem(
+                    icon: Icons.inventory_2_rounded,
+                    title: 'Kelola Item',
+                    isActive: currentRoute == '/item-management',
+                    onTap: () {
+                      Get.back();
+                      if (currentRoute != '/item-management') {
+                        Get.toNamed('/item-management');
+                      }
+                    },
+                  ),
+                  _DrawerMenuItem(
                     icon: Icons.history_rounded,
                     title: 'Riwayat',
                     isActive: currentRoute == '/history',

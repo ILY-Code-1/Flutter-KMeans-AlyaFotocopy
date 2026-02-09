@@ -71,28 +71,21 @@ class LoginView extends GetView<LoginController> {
       children: [
         // Abstract dummy logo - simple geometric shape
         Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF4A90E2), Color(0xFF7AB8F5)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF4A90E2).withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+          width: 100,
+          height: 100,
+          // BoxDecoration dihapus sesuai permintaan
+          child: Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(
+                16,
+              ), // Memberikan radius pada gambar
+              child: Image(
+                image: const AssetImage('assets/images/logo_alya.jpg'),
+                width: 56, // Ukuran diperbesar dari 32 ke 56
+                height: 56, // Ukuran diperbesar dari 32 ke 56
+                fit: BoxFit
+                    .cover, // Memastikan gambar memenuhi area tanpa distorsi
               ),
-            ],
-          ),
-          child: const Center(
-            child: Image(
-              image: AssetImage('assets/images/logo.png'),
-              width: 32,
-              height: 32,
             ),
           ),
         ),

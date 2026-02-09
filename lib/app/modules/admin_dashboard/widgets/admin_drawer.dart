@@ -35,23 +35,19 @@ class AdminDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 64,
-                    height: 64,
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
-                    child: Image(
-                      image: AssetImage('assets/images/logo.png'),
-                      width: 32,
-                      height: 32,
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/logo_alya.jpg',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit
+                            .cover, // Penting agar gambar memenuhi area lingkaran dengan rapi
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),

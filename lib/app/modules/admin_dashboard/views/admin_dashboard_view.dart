@@ -163,10 +163,14 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                 color: Colors.white.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 48,
-                height: 48,
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/logo_alya.jpg',
+                  width: 64,
+                  height: 64,
+                  fit: BoxFit
+                      .cover, // Penting agar gambar memenuhi area lingkaran dengan rapi
+                ),
               ),
             ),
           ],

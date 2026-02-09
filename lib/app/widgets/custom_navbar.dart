@@ -65,16 +65,19 @@ class CustomNavbar extends StatelessWidget implements PreferredSizeWidget {
               ),
             // Logo placeholder - 40x40
             Container(
-              width: 40,
-              height: 40,
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
               ),
-              child: const Image(
-                image: AssetImage('assets/images/logo.png'),
-                width: 32,
-                height: 32,
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/logo_alya.jpg',
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit
+                      .cover, // Penting agar gambar memenuhi area lingkaran dengan rapi
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),

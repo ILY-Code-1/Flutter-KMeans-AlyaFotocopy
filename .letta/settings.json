@@ -26,7 +26,9 @@
       "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\controllers\" -Force)",
       "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\views\" -Force)",
       "Bash(New-Item -ItemType Directory -Path \"lib\\app\\modules\\admin_dashboard\\widgets\" -Force)",
-      "Bash(mkdir \"lib\\app\\modules\\admin_dashboard\\bindings\" \"lib\\app\\modules\\admin_dashboard\\controllers\" \"lib\\app\\modules\\admin_dashboard\\views\" \"lib\\app\\modules\\admin_dashboard\\widgets\")"
+      "Bash(mkdir \"lib\\app\\modules\\admin_dashboard\\bindings\" \"lib\\app\\modules\\admin_dashboard\\controllers\" \"lib\\app\\modules\\admin_dashboard\\views\" \"lib\\app\\modules\\admin_dashboard\\widgets\")",
+      "Bash(flutter analyze 2>&1 | grep -E \"(error|warning)\" | head -20)",
+      "Bash(flutter analyze 2>&1 | Select-String -Pattern \"error\")"
     ]
   }
 }

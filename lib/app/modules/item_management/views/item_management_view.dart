@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../themes/themes.dart';
+import '../../../widgets/custom_input.dart';
 import '../controllers/item_management_controller.dart';
 import '../../admin_dashboard/widgets/admin_drawer.dart';
 
@@ -213,7 +214,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
           ],
         ),
         child: FloatingActionButton.extended(
-          onPressed: () => controller.showItemFormDialog(),
+          onPressed: () => showItemFormDialog(),
           foregroundColor: Colors.white,
           elevation: 0,
           icon: const Icon(Icons.add, size: 24),
@@ -347,7 +348,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
                           icon: const Icon(Icons.edit_outlined),
                           color: Colors.blue.shade700,
                           onPressed: () =>
-                              controller.showItemFormDialog(item: item),
+                              showItemFormDialog(item: item),
                           tooltip: 'Edit',
                         ),
                       ),
@@ -480,7 +481,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
                             icon: const Icon(Icons.edit_outlined),
                             color: Colors.blue.shade700,
                             tooltip: 'Edit',
-                            onPressed: () => controller.showItemFormDialog(item: item),
+                            onPressed: () => showItemFormDialog(item: item),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -538,6 +539,245 @@ class ItemManagementView extends GetView<ItemManagementController> {
           color: AppColors.textPrimary,
         ),
       ),
+    );
+  }
+
+  void showItemFormDialog({Map<String, dynamic>? item}) {
+    if (item == null) {
+      controller.resetForm();
+    } else {
+      controller.loadItemToForm(item);
+    }
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          width: 600,
+          constraints: const BoxConstraints(maxHeight: 800),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: controller.formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    item == null ? 'Tambah Item Baru' : 'Edit Item',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Nama Barang field
+                  CustomInput(
+                    label: 'Nama Barang',
+                    hint: 'Kertas A4',
+                    controller: controller.namaBarangController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama barang tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.inventory_2_outlined),
+                    infoTooltip: 'Nama produk atau barang yang akan dikelola',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Stok Awal field
+                  CustomInput(
+                    label: 'Stok Awal',
+                    hint: '5',
+                    controller: controller.stokAwalController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Stok awal tidak boleh kosong';
+                      }
+                      final num = int.tryParse(value);
+                      if (num == null || num < 0) {
+                        return 'Masukkan angka yang valid';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.looks_one_outlined),
+                    infoTooltip: 'Jumlah stok di awal periode (unit)',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Stok Akhir field
+                  CustomInput(
+                    label: 'Stok Akhir',
+                    hint: '2',
+                    controller: controller.stokAkhirController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Stok akhir tidak boleh kosong';
+                      }
+                      final num = int.tryParse(value);
+                      if (num == null || num < 0) {
+                        return 'Masukkan angka yang valid';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.looks_two_outlined),
+                    infoTooltip: 'Jumlah stok di akhir periode (unit)',
+                    onChanged: (_) => controller.calculateHariPerkiraanHabis(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Barang Masuk field
+                  CustomInput(
+                    label: 'Jumlah Barang Masuk',
+                    hint: '7',
+                    controller: controller.barangMasukController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jumlah barang masuk tidak boleh kosong';
+                      }
+                      final num = int.tryParse(value);
+                      if (num == null || num < 0) {
+                        return 'Masukkan angka yang valid';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.input_outlined),
+                    infoTooltip: 'Total barang yang masuk/terbeli selama periode (unit)',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Barang Keluar field
+                  CustomInput(
+                    label: 'Jumlah Barang Keluar',
+                    hint: '10',
+                    controller: controller.barangKeluarController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jumlah barang keluar tidak boleh kosong';
+                      }
+                      final num = int.tryParse(value);
+                      if (num == null || num < 0) {
+                        return 'Masukkan angka yang valid';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.output_outlined),
+                    infoTooltip: 'Total barang yang keluar/terjual selama periode (unit)',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Rata-rata Pemakaian Bulanan field
+                  CustomInput(
+                    label: 'Rata-rata Pemakaian Bulanan',
+                    hint: '0.83',
+                    controller: controller.rataRataPemakaianController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Rata-rata pemakaian tidak boleh kosong';
+                      }
+                      final num = double.tryParse(value);
+                      if (num == null || num < 0) {
+                        return 'Masukkan angka yang valid';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.calendar_month_outlined),
+                    infoTooltip: 'Rata-rata jumlah (unit) pemakaian per bulan',
+                    onChanged: (_) {
+                      controller.calculateHariPerkiraanHabis();
+                      controller.calculateFluktuasiPemakaian();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Frekuensi Pembaruan Stok field
+                  CustomInput(
+                    label: 'Frekuensi Pembaruan Stok',
+                    hint: '1',
+                    controller: controller.frekuensiPembaruanController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Frekuensi pembaruan tidak boleh kosong';
+                      }
+                      final num = int.tryParse(value);
+                      if (num == null || num < 0) {
+                        return 'Masukkan angka yang valid';
+                      }
+                      return null;
+                    },
+                    prefixIcon: const Icon(Icons.update_outlined),
+                    infoTooltip: 'Berapa kali barang diisi ulang dalam satu periode',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Hari Perkiraan Stok Habis field (otomatis)
+                  CustomInput(
+                    label: 'Hari Perkiraan Stok Habis (otomatis)',
+                    hint: '74.07',
+                    controller: controller.hariPerkiraanHabisController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    enabled: false,
+                    prefixIcon: const Icon(Icons.timer_outlined),
+                    infoTooltip: 'Estimasi berapa hari hingga stok habis -> stok_akhir / (rata_rata_pemakaian_bulanan / 30)',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Fluktuasi Pemakaian Bulanan field (otomatis)
+                  CustomInput(
+                    label: 'Fluktuasi Pemakaian Bulanan (otomatis)',
+                    hint: '0.16',
+                    controller: controller.fluktuasiPemakaianController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    enabled: false,
+                    prefixIcon: const Icon(Icons.trending_up_outlined),
+                    infoTooltip: 'Standar deviasi pemakaian bulanan -> 0.2 x rata_rata_pemakaian_bulanan',
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('Batal'),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () => controller.saveItem().then((_) {
+                          if (controller.formKey.currentState?.validate() ?? false) {
+                            Get.back();
+                          }
+                        }),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                        ),
+                        child: Text(item == null ? 'Tambah' : 'Simpan'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
     );
   }
 }

@@ -144,6 +144,12 @@ class HomeView extends GetView<HomeController> {
                   onPressed: controller.navigateToKMeans,
                 ),
                 PrimaryButton(
+                  text: 'Hitung Cepat',
+                  icon: Icons.speed,
+                  onPressed: () => Get.toNamed('/quick-calc'),
+                  backgroundColor: AppColors.warning,
+                ),
+                PrimaryButton(
                   text: 'Upload Excel',
                   icon: Icons.upload_file,
                   onPressed: controller.navigateToUploadExcel,

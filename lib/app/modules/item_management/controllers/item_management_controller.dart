@@ -72,283 +72,58 @@ class ItemManagementController extends GetxController {
     }
   }
 
-  // Show form dialog untuk tambah/edit item
-  void showItemFormDialog({Map<String, dynamic>? item}) {
-    // Reset form
-    if (item == null) {
-      // Mode tambah
-      editingItemId = null;
-      namaBarangController.clear();
-      stokAwalController.clear();
-      stokAkhirController.clear();
-      barangMasukController.clear();
-      barangKeluarController.clear();
-      rataRataPemakaianController.clear();
-      frekuensiPembaruanController.clear();
-      hariPerkiraanHabisController.clear();
-      fluktuasiPemakaianController.clear();
+  // Hitung Hari Perkiraan Stok Habis secara otomatis
+  void calculateHariPerkiraanHabis() {
+    final stokAkhir = double.tryParse(stokAkhirController.text) ?? 0;
+    final rataRataBulanan = double.tryParse(rataRataPemakaianController.text) ?? 0;
+
+    if (stokAkhir > 0 && rataRataBulanan > 0) {
+      final pemakaianPerHari = rataRataBulanan / 30;
+      final estimasiHari = stokAkhir / pemakaianPerHari;
+      hariPerkiraanHabisController.text = estimasiHari.toStringAsFixed(2);
     } else {
-      // Mode edit
-      editingItemId = item['id'];
-      namaBarangController.text = item['namaBarang'] ?? '';
-      stokAwalController.text = (item['stokAwal'] ?? 0).toString();
-      stokAkhirController.text = (item['stokAkhir'] ?? 0).toString();
-      barangMasukController.text = (item['barangMasuk'] ?? 0).toString();
-      barangKeluarController.text = (item['barangKeluar'] ?? 0).toString();
-      rataRataPemakaianController.text = (item['rataRataPemakaian'] ?? 0).toString();
-      frekuensiPembaruanController.text = (item['frekuensiPembaruan'] ?? 0).toString();
-      hariPerkiraanHabisController.text = (item['hariPerkiraanHabis'] ?? 0).toString();
-      fluktuasiPemakaianController.text = (item['fluktuasiPemakaian'] ?? 0).toString();
+      hariPerkiraanHabisController.text = "0.00";
     }
+  }
 
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          width: 600,
-          constraints: const BoxConstraints(maxHeight: 800),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text(
-                    editingItemId == null ? 'Tambah Item Baru' : 'Edit Item',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
+  // Hitung Fluktuasi Pemakaian Bulanan secara otomatis
+  void calculateFluktuasiPemakaian() {
+    final rataRataBulanan = double.tryParse(rataRataPemakaianController.text) ?? 0;
 
-                  // Nama Barang field
-                  TextFormField(
-                    controller: namaBarangController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nama Barang',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.inventory_2_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama barang tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+    if (rataRataBulanan > 0) {
+      final std = 0.2 * rataRataBulanan;
+      fluktuasiPemakaianController.text = std.toStringAsFixed(2);
+    } else {
+      fluktuasiPemakaianController.text = "0.00";
+    }
+  }
 
-                  // Stok Awal field
-                  TextFormField(
-                    controller: stokAwalController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Stok Awal',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.looks_one_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Stok awal tidak boleh kosong';
-                      }
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+  // Reset form
+  void resetForm() {
+    editingItemId = null;
+    namaBarangController.clear();
+    stokAwalController.clear();
+    stokAkhirController.clear();
+    barangMasukController.clear();
+    barangKeluarController.clear();
+    rataRataPemakaianController.clear();
+    frekuensiPembaruanController.clear();
+    hariPerkiraanHabisController.clear();
+    fluktuasiPemakaianController.clear();
+  }
 
-                  // Stok Akhir field
-                  TextFormField(
-                    controller: stokAkhirController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Stok Akhir',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.looks_two_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Stok akhir tidak boleh kosong';
-                      }
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Barang Masuk field
-                  TextFormField(
-                    controller: barangMasukController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Jumlah Barang Masuk',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.input_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Jumlah barang masuk tidak boleh kosong';
-                      }
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Barang Keluar field
-                  TextFormField(
-                    controller: barangKeluarController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Jumlah Barang Keluar',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.output_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Jumlah barang keluar tidak boleh kosong';
-                      }
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Rata-rata Pemakaian Bulanan field
-                  TextFormField(
-                    controller: rataRataPemakaianController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Rata-rata Pemakaian Bulanan',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.calendar_month_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Rata-rata pemakaian tidak boleh kosong';
-                      }
-                      final num = double.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Frekuensi Pembaruan Stok field
-                  TextFormField(
-                    controller: frekuensiPembaruanController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Frekuensi Pembaruan Stok',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.update_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Frekuensi pembaruan tidak boleh kosong';
-                      }
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Hari Perkiraan Stok Habis field
-                  TextFormField(
-                    controller: hariPerkiraanHabisController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Hari Perkiraan Stok Habis',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.timer_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Hari perkiraan tidak boleh kosong';
-                      }
-                      final num = int.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Fluktuasi Pemakaian Bulanan field
-                  TextFormField(
-                    controller: fluktuasiPemakaianController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Fluktuasi Pemakaian Bulanan',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.trending_up_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Fluktuasi pemakaian tidak boleh kosong';
-                      }
-                      final num = double.tryParse(value);
-                      if (num == null || num < 0) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Get.back(),
-                        child: const Text('Batal'),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () => saveItem(),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
-                          ),
-                        ),
-                        child: Text(editingItemId == null ? 'Tambah' : 'Simpan'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      barrierDismissible: false,
-    );
+  // Load data ke form untuk edit
+  void loadItemToForm(Map<String, dynamic> item) {
+    editingItemId = item['id'];
+    namaBarangController.text = item['namaBarang'] ?? '';
+    stokAwalController.text = (item['stokAwal'] ?? 0).toString();
+    stokAkhirController.text = (item['stokAkhir'] ?? 0).toString();
+    barangMasukController.text = (item['barangMasuk'] ?? 0).toString();
+    barangKeluarController.text = (item['barangKeluar'] ?? 0).toString();
+    rataRataPemakaianController.text = (item['rataRataPemakaian'] ?? 0).toString();
+    frekuensiPembaruanController.text = (item['frekuensiPembaruan'] ?? 0).toString();
+    hariPerkiraanHabisController.text = (item['hariPerkiraanHabis'] ?? 0).toString();
+    fluktuasiPemakaianController.text = (item['fluktuasiPemakaian'] ?? 0).toString();
   }
 
   // Save item (Create or Update)
@@ -368,7 +143,7 @@ class ItemManagementController extends GetxController {
         'barangKeluar': int.parse(barangKeluarController.text),
         'rataRataPemakaian': double.parse(rataRataPemakaianController.text),
         'frekuensiPembaruan': int.parse(frekuensiPembaruanController.text),
-        'hariPerkiraanHabis': int.parse(hariPerkiraanHabisController.text),
+        'hariPerkiraanHabis': double.parse(hariPerkiraanHabisController.text),
         'fluktuasiPemakaian': double.parse(fluktuasiPemakaianController.text),
         'updatedAt': DateTime.now(),
       };
@@ -376,8 +151,6 @@ class ItemManagementController extends GetxController {
       if (editingItemId == null) {
         // Create new item
         await _firestore.collection('items').add(itemData);
-
-        Get.back(); // Close dialog
 
         Get.snackbar(
           'Berhasil',
@@ -392,8 +165,6 @@ class ItemManagementController extends GetxController {
             .collection('items')
             .doc(editingItemId)
             .update(itemData);
-
-        Get.back(); // Close dialog
 
         Get.snackbar(
           'Berhasil',

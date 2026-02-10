@@ -8,6 +8,7 @@ class AdminDashboardController extends GetxController {
   final RxInt totalCalculations = 0.obs;
   final RxInt totalStaffUsers = 0.obs;
   final RxInt totalAdminUsers = 0.obs;
+  final RxInt totalItems = 0.obs;
   final RxBool isLoading = true.obs;
 
   @override
@@ -45,6 +46,10 @@ class AdminDashboardController extends GetxController {
           .collection('kmeans_results')
           .get();
       totalCalculations.value = calculationsSnapshot.docs.length;
+
+      // Fetch total items
+      final itemsSnapshot = await _firestore.collection('items').get();
+      totalItems.value = itemsSnapshot.docs.length;
 
       isLoading.value = false;
     } catch (e) {

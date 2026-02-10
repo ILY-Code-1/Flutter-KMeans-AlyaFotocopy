@@ -21,7 +21,11 @@ class ItemManagementView extends GetView<ItemManagementController> {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.inventory_2, color: Colors.white, size: 24),
+              child: const Icon(
+                Icons.inventory_2,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 12),
             const Text(
@@ -57,7 +61,10 @@ class ItemManagementView extends GetView<ItemManagementController> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [const Color.fromARGB(255, 158, 199, 249).withOpacity(0.1), Colors.white],
+            colors: [
+              const Color.fromARGB(255, 158, 199, 249).withOpacity(0.1),
+              Colors.white,
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -330,9 +337,22 @@ class ItemManagementView extends GetView<ItemManagementController> {
                     spacing: 12,
                     runSpacing: 8,
                     children: [
-                      _buildInfoChip('Masuk: ${item['barangMasuk'] ?? 0}', Icons.input),
-                      _buildInfoChip('Keluar: ${item['barangKeluar'] ?? 0}', Icons.output),
-                      _buildInfoChip('Hari Habis: ${item['hariPerkiraanHabis'] ?? 0}', Icons.timer),
+                      _buildInfoChip(
+                        'Masuk: ${item['barangMasuk'] ?? 0}',
+                        Icons.input,
+                      ),
+                      _buildInfoChip(
+                        'Keluar: ${item['barangKeluar'] ?? 0}',
+                        Icons.output,
+                      ),
+                      _buildInfoChip(
+                        'Hari Habis: ${item['hariPerkiraanHabis'] ?? 0}',
+                        Icons.timer,
+                      ),
+                      _buildInfoChip(
+                        controller.formatRupiah(item['harga'] as int?),
+                        Icons.payments_outlined,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -347,8 +367,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
                         child: IconButton(
                           icon: const Icon(Icons.edit_outlined),
                           color: Colors.blue.shade700,
-                          onPressed: () =>
-                              showItemFormDialog(item: item),
+                          onPressed: () => showItemFormDialog(item: item),
                           tooltip: 'Edit',
                         ),
                       ),
@@ -445,6 +464,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
               _buildDataColumn('Frekuensi', Icons.update_outlined),
               _buildDataColumn('Hari Habis', Icons.timer_outlined),
               _buildDataColumn('Fluktuasi', Icons.trending_up_outlined),
+              _buildDataColumn('Harga', Icons.payments_outlined),
               _buildDataColumn('Aksi', Icons.settings_outlined),
             ],
             rows: controller.items.asMap().entries.map((entry) {
@@ -452,7 +472,9 @@ class ItemManagementView extends GetView<ItemManagementController> {
               final item = entry.value;
 
               return DataRow(
-                color: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                color: WidgetStateProperty.resolveWith<Color>((
+                  Set<WidgetState> states,
+                ) {
                   if (index.isEven) {
                     return AppColors.softBlue.withOpacity(0.3);
                   }
@@ -468,6 +490,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
                   _buildDataCell((item['frekuensiPembaruan'] ?? 0).toString()),
                   _buildDataCell((item['hariPerkiraanHabis'] ?? 0).toString()),
                   _buildDataCell((item['fluktuasiPemakaian'] ?? 0).toString()),
+                  _buildDataCell(controller.formatRupiah(item['harga'] as int?)),
                   DataCell(
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -551,9 +574,7 @@ class ItemManagementView extends GetView<ItemManagementController> {
 
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           width: 600,
           constraints: const BoxConstraints(maxHeight: 800),
@@ -651,7 +672,8 @@ class ItemManagementView extends GetView<ItemManagementController> {
                       return null;
                     },
                     prefixIcon: const Icon(Icons.input_outlined),
-                    infoTooltip: 'Total barang yang masuk/terbeli selama periode (unit)',
+                    infoTooltip:
+                        'Total barang yang masuk/terbeli selama periode (unit)',
                   ),
                   const SizedBox(height: 16),
 
@@ -672,7 +694,8 @@ class ItemManagementView extends GetView<ItemManagementController> {
                       return null;
                     },
                     prefixIcon: const Icon(Icons.output_outlined),
-                    infoTooltip: 'Total barang yang keluar/terjual selama periode (unit)',
+                    infoTooltip:
+                        'Total barang yang keluar/terjual selama periode (unit)',
                   ),
                   const SizedBox(height: 16),
 
@@ -681,7 +704,9 @@ class ItemManagementView extends GetView<ItemManagementController> {
                     label: 'Rata-rata Pemakaian Bulanan',
                     hint: '0.83',
                     controller: controller.rataRataPemakaianController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Rata-rata pemakaian tidak boleh kosong';
@@ -718,7 +743,8 @@ class ItemManagementView extends GetView<ItemManagementController> {
                       return null;
                     },
                     prefixIcon: const Icon(Icons.update_outlined),
-                    infoTooltip: 'Berapa kali barang diisi ulang dalam satu periode',
+                    infoTooltip:
+                        'Berapa kali barang diisi ulang dalam satu periode',
                   ),
                   const SizedBox(height: 16),
 
@@ -727,10 +753,13 @@ class ItemManagementView extends GetView<ItemManagementController> {
                     label: 'Hari Perkiraan Stok Habis (otomatis)',
                     hint: '74.07',
                     controller: controller.hariPerkiraanHabisController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     enabled: false,
                     prefixIcon: const Icon(Icons.timer_outlined),
-                    infoTooltip: 'Estimasi berapa hari hingga stok habis -> stok_akhir / (rata_rata_pemakaian_bulanan / 30)',
+                    infoTooltip:
+                        'Estimasi berapa hari hingga stok habis -> stok_akhir / (rata_rata_pemakaian_bulanan / 30)',
                   ),
                   const SizedBox(height: 16),
 
@@ -739,10 +768,24 @@ class ItemManagementView extends GetView<ItemManagementController> {
                     label: 'Fluktuasi Pemakaian Bulanan (otomatis)',
                     hint: '0.16',
                     controller: controller.fluktuasiPemakaianController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     enabled: false,
                     prefixIcon: const Icon(Icons.trending_up_outlined),
-                    infoTooltip: 'Standar deviasi pemakaian bulanan -> 0.2 x rata_rata_pemakaian_bulanan',
+                    infoTooltip:
+                        'Standar deviasi pemakaian bulanan -> 0.2 x rata_rata_pemakaian_bulanan',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Harga field (nullable)
+                  CustomInput(
+                    label: 'Harga (Rupiah)',
+                    hint: '5000',
+                    controller: controller.hargaController,
+                    keyboardType: TextInputType.number,
+                    prefixIcon: const Icon(Icons.payments_outlined),
+                    infoTooltip: 'Harga per unit barang (opsional, bisa diisi nanti)',
                   ),
                   const SizedBox(height: 24),
 
@@ -756,11 +799,14 @@ class ItemManagementView extends GetView<ItemManagementController> {
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
-                        onPressed: () => controller.saveItem().then((_) {
-                          if (controller.formKey.currentState?.validate() ?? false) {
+                        onPressed: () async {
+                          // 1. Validasi form terlebih dahulu
+                          if (controller.formKey.currentState?.validate() ??
+                              false) {
                             Get.back();
+                            await controller.saveItem();
                           }
-                        }),
+                        },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 32,

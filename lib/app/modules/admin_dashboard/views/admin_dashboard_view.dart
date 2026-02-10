@@ -213,6 +213,14 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
           color: AppColors.info,
           delay: 450,
         ),
+        const SizedBox(height: 16),
+        _buildStatCard(
+          title: 'Total Item',
+          value: controller.totalItems.value.toString(),
+          icon: Icons.inventory_2_rounded,
+          color: AppColors.error,
+          delay: 600,
+        ),
       ],
     );
   }
@@ -263,6 +271,20 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                 icon: Icons.admin_panel_settings_rounded,
                 color: AppColors.info,
                 delay: 450,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                title: 'Total Item',
+                value: controller.totalItems.value.toString(),
+                icon: Icons.inventory_2_rounded,
+                color: AppColors.error,
+                delay: 600,
               ),
             ),
           ],

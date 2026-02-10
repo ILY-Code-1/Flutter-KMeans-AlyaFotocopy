@@ -75,10 +75,7 @@ class QuickCalcView extends GetView<QuickCalcController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Data Item Dari Management',
-                      style: AppTextStyles.h4,
-                    ),
+                    Text('Data Item Dari Management', style: AppTextStyles.h4),
                     const SizedBox(height: 4),
                     Text(
                       'Data diambil secara otomatis dari Firebase collection "items"',
@@ -104,12 +101,14 @@ class QuickCalcView extends GetView<QuickCalcController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Data Item', style: AppTextStyles.h4),
-            Obx(() => Text(
-              'Total: ${controller.items.length} item',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+            Obx(
+              () => Text(
+                'Total: ${controller.items.length} item',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
-            )),
+            ),
           ],
         ),
         Gap.hSm,
@@ -168,9 +167,11 @@ class QuickCalcView extends GetView<QuickCalcController> {
             itemBuilder: (context, index) {
               final item = controller.items[index];
               return DataListTile(
+                isQuickCalc: true,
                 index: index,
                 title: item.namaBarang,
-                subtitle: 'Stok Awal dan Akhir: ${item.stokAwal.toStringAsFixed(0)} → ${item.stokAkhir.toStringAsFixed(0)}',
+                subtitle:
+                    'Stok Awal dan Akhir: ${item.stokAwal.toStringAsFixed(0)} → ${item.stokAkhir.toStringAsFixed(0)}',
                 data: item.toDisplayMap(),
               );
             },
@@ -184,22 +185,28 @@ class QuickCalcView extends GetView<QuickCalcController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Obx(() => PrimaryButton(
-              text: 'Mulai Clustering',
-              icon: Icons.hub,
-              backgroundColor: AppColors.secondary,
-              isLoading: controller.isProcessing.value,
-              onPressed: controller.isProcessing.value ? null : controller.performKMeansClustering,
-            )),
+        Obx(
+          () => PrimaryButton(
+            text: 'Mulai Clustering',
+            icon: Icons.hub,
+            backgroundColor: AppColors.secondary,
+            isLoading: controller.isProcessing.value,
+            onPressed: controller.isProcessing.value
+                ? null
+                : controller.performKMeansClustering,
+          ),
+        ),
         Gap.hMd,
-        Obx(() => Text(
-              'Minimal 3 item diperlukan untuk clustering',
-              style: AppTextStyles.caption.copyWith(
-                color: controller.items.length < 3
-                    ? AppColors.error
-                    : AppColors.textHint,
-              ),
-            )),
+        Obx(
+          () => Text(
+            'Minimal 3 item diperlukan untuk clustering',
+            style: AppTextStyles.caption.copyWith(
+              color: controller.items.length < 3
+                  ? AppColors.error
+                  : AppColors.textHint,
+            ),
+          ),
+        ),
       ],
     );
   }

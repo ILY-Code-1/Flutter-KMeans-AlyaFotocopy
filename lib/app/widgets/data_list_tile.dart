@@ -8,6 +8,7 @@ class DataListTile extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final int index;
+  final bool isQuickCalc;
 
   const DataListTile({
     super.key,
@@ -17,6 +18,7 @@ class DataListTile extends StatelessWidget {
     this.onEdit,
     this.onDelete,
     required this.index,
+    required this.isQuickCalc,
   });
 
   @override
@@ -50,26 +52,42 @@ class DataListTile extends StatelessWidget {
               ),
             ),
           ),
-          title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-          subtitle: subtitle != null ? Text(subtitle!, style: AppTextStyles.caption) : null,
+          title: Text(
+            title,
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: subtitle != null
+              ? Text(subtitle!, style: AppTextStyles.caption)
+              : null,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: AppColors.primary),
-                onPressed: onEdit,
-                tooltip: 'Edit',
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: AppColors.error),
-                onPressed: onDelete,
-                tooltip: 'Hapus',
-              ),
+              if (isQuickCalc == true) ...[
+                IconButton(
+                  icon: const Icon(
+                    Icons.remove_red_eye_outlined,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: null,
+                  tooltip: 'info',
+                ),
+              ] else ...[
+                IconButton(
+                  icon: const Icon(Icons.edit, color: AppColors.primary),
+                  onPressed: onEdit,
+                  tooltip: 'Edit',
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: AppColors.error),
+                  onPressed: onDelete,
+                  tooltip: 'Hapus',
+                ), // Placeholder untuk ikon info
+              ],
             ],
           ),
-          children: [
-            if (data != null) _buildDataGrid(context),
-          ],
+          children: [if (data != null) _buildDataGrid(context)],
         ),
       ),
     );
@@ -88,12 +106,11 @@ class DataListTile extends StatelessWidget {
             children: [
               Text(
                 '${entry.key}: ',
-                style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w500),
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              Text(
-                entry.value,
-                style: AppTextStyles.bodySmall,
-              ),
+              Text(entry.value, style: AppTextStyles.bodySmall),
             ],
           ),
         );

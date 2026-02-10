@@ -58,10 +58,14 @@ class KMeansView extends GetView<KMeansController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(() => Text(
-                  controller.isEditing.value ? 'Edit Data Item' : 'Tambah Data Item',
-                  style: AppTextStyles.h4,
-                )),
+            Obx(
+              () => Text(
+                controller.isEditing.value
+                    ? 'Edit Data Item'
+                    : 'Tambah Data Item',
+                style: AppTextStyles.h4,
+              ),
+            ),
             Gap.hMd,
             Text(
               'Masukkan data item untuk analisis clustering',
@@ -84,19 +88,24 @@ class KMeansView extends GetView<KMeansController> {
     final isMobile = Responsive.isMobile(context);
 
     void hitungDayToStockOut() {
-      final stokAkhir = double.tryParse(controller.stokAkhirController.text) ?? 0;
-      final rataRataBulanan = double.tryParse(controller.rataRataPemakaianController.text) ?? 0;
+      final stokAkhir =
+          double.tryParse(controller.stokAkhirController.text) ?? 0;
+      final rataRataBulanan =
+          double.tryParse(controller.rataRataPemakaianController.text) ?? 0;
       if (stokAkhir > 0 && rataRataBulanan > 0) {
         final pemakaianPerHari = rataRataBulanan / 30;
         final estimasiHari = stokAkhir / pemakaianPerHari;
-        controller.dayToStockOutController.text = estimasiHari.toStringAsFixed(2);
+        controller.dayToStockOutController.text = estimasiHari.toStringAsFixed(
+          2,
+        );
       } else {
         controller.dayToStockOutController.text = "0.00";
       }
     }
 
     void hitungFluktuasi() {
-      final rataRataBulanan = double.tryParse(controller.rataRataPemakaianController.text) ?? 0;
+      final rataRataBulanan =
+          double.tryParse(controller.rataRataPemakaianController.text) ?? 0;
       if (rataRataBulanan > 0) {
         final std = 0.2 * rataRataBulanan;
         controller.fluktuasiPemakaianController.text = std.toStringAsFixed(2);
@@ -182,7 +191,8 @@ class KMeansView extends GetView<KMeansController> {
         validator: controller.validateNumber,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon: const Icon(Icons.schedule),
-        infoTooltip: 'Estimasi berapa hari hingga stok habis -> stok_akhir / (rata_rata_pemakaian_bulanan / 30)',
+        infoTooltip:
+            'Estimasi berapa hari hingga stok habis -> stok_akhir / (rata_rata_pemakaian_bulanan / 30)',
         enabled: false,
       ),
       CustomInput(
@@ -192,17 +202,22 @@ class KMeansView extends GetView<KMeansController> {
         validator: controller.validateNumber,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon: const Icon(Icons.show_chart),
-        infoTooltip: 'Standar deviasi pemakaian bulanan -> 0.2 x rata_rata_pemakaian_bulanan',
+        infoTooltip:
+            'Standar deviasi pemakaian bulanan -> 0.2 x rata_rata_pemakaian_bulanan',
         enabled: false,
       ),
     ];
 
     if (isMobile) {
       return Column(
-        children: fields.map((field) => Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: field,
-        )).toList(),
+        children: fields
+            .map(
+              (field) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: field,
+              ),
+            )
+            .toList(),
       );
     }
 
@@ -234,24 +249,28 @@ class KMeansView extends GetView<KMeansController> {
       spacing: AppSpacing.md,
       runSpacing: AppSpacing.sm,
       children: [
-        Obx(() => PrimaryButton(
-              text: controller.isEditing.value ? 'Perbarui' : 'Tambah',
-              icon: controller.isEditing.value ? Icons.save : Icons.add,
-              onPressed: controller.addOrUpdateItem,
-            )),
-        Obx(() => controller.isEditing.value
-            ? PrimaryButton(
-                text: 'Batal',
-                isOutlined: true,
-                icon: Icons.close,
-                onPressed: controller.clearForm,
-              )
-            : PrimaryButton(
-                text: 'Bersihkan',
-                isOutlined: true,
-                icon: Icons.cleaning_services,
-                onPressed: controller.clearForm,
-              )),
+        Obx(
+          () => PrimaryButton(
+            text: controller.isEditing.value ? 'Perbarui' : 'Tambah',
+            icon: controller.isEditing.value ? Icons.save : Icons.add,
+            onPressed: controller.addOrUpdateItem,
+          ),
+        ),
+        Obx(
+          () => controller.isEditing.value
+              ? PrimaryButton(
+                  text: 'Batal',
+                  isOutlined: true,
+                  icon: Icons.close,
+                  onPressed: controller.clearForm,
+                )
+              : PrimaryButton(
+                  text: 'Bersihkan',
+                  isOutlined: true,
+                  icon: Icons.cleaning_services,
+                  onPressed: controller.clearForm,
+                ),
+        ),
       ],
     );
   }
@@ -308,9 +327,11 @@ class KMeansView extends GetView<KMeansController> {
             itemBuilder: (context, index) {
               final item = controller.items[index];
               return DataListTile(
+                isQuickCalc: false,
                 index: index,
                 title: item.namaBarang,
-                subtitle: 'Stok Awal dan Akhir: ${item.stokAwal.toStringAsFixed(0)} → ${item.stokAkhir.toStringAsFixed(0)}',
+                subtitle:
+                    'Stok Awal dan Akhir: ${item.stokAwal.toStringAsFixed(0)} → ${item.stokAkhir.toStringAsFixed(0)}',
                 data: item.toDisplayMap(),
                 onEdit: () => controller.editItem(item),
                 onDelete: () => controller.deleteItem(item.id),
@@ -326,13 +347,17 @@ class KMeansView extends GetView<KMeansController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Obx(() => PrimaryButton(
-              text: 'Mulai Clustering',
-              icon: Icons.hub,
-              backgroundColor: AppColors.secondary,
-              isLoading: controller.isProcessing.value,
-              onPressed: controller.isProcessing.value ? null : controller.navigateToForm,
-            )),
+        Obx(
+          () => PrimaryButton(
+            text: 'Mulai Clustering',
+            icon: Icons.hub,
+            backgroundColor: AppColors.secondary,
+            isLoading: controller.isProcessing.value,
+            onPressed: controller.isProcessing.value
+                ? null
+                : controller.navigateToForm,
+          ),
+        ),
       ],
     );
   }

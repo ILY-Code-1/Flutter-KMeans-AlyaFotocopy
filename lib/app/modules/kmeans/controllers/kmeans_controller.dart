@@ -16,6 +16,7 @@ class ItemData {
   double frekuensiRestock;
   double dayToStockOut;
   double fluktuasiPemakaian;
+  int? harga;
 
   ItemData({
     required this.id,
@@ -28,6 +29,7 @@ class ItemData {
     required this.frekuensiRestock,
     required this.dayToStockOut,
     required this.fluktuasiPemakaian,
+    this.harga,
   });
 
   Map<String, dynamic> toJson() {
@@ -42,6 +44,7 @@ class ItemData {
       'frekuensiRestock': frekuensiRestock,
       'dayToStockOut': dayToStockOut,
       'fluktuasiPemakaian': fluktuasiPemakaian,
+      'harga': harga,
     };
   }
 
@@ -57,6 +60,7 @@ class ItemData {
       frekuensiRestock: (json['frekuensiRestock'] as num).toDouble(),
       dayToStockOut: (json['dayToStockOut'] as num).toDouble(),
       fluktuasiPemakaian: (json['fluktuasiPemakaian'] as num).toDouble(),
+      harga: json['harga'] as int?,
     );
   }
 
@@ -70,6 +74,7 @@ class ItemData {
       'Frek. Restock': frekuensiRestock.toStringAsFixed(0),
       'Day To Stock Out': dayToStockOut.toStringAsFixed(1),
       'Fluktuasi': fluktuasiPemakaian.toStringAsFixed(2),
+      'Harga': harga != null ? 'Rp ${harga.toString()}' : '-',
     };
   }
 }
@@ -389,6 +394,7 @@ class KMeansController extends GetxController {
               'frekuensiRestock': item.frekuensiRestock,
               'dayToStockOut': item.dayToStockOut,
               'fluktuasiPemakaian': item.fluktuasiPemakaian,
+              'harga': item.harga,
             },
           )
           .toList(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class ItemManagementController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -18,6 +19,7 @@ class ItemManagementController extends GetxController {
   final frekuensiPembaruanController = TextEditingController();
   final hariPerkiraanHabisController = TextEditingController();
   final fluktuasiPemakaianController = TextEditingController();
+  final hargaController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   // Mode edit atau tambah
@@ -40,6 +42,7 @@ class ItemManagementController extends GetxController {
     frekuensiPembaruanController.dispose();
     hariPerkiraanHabisController.dispose();
     fluktuasiPemakaianController.dispose();
+    hargaController.dispose();
     super.onClose();
   }
 
@@ -110,6 +113,7 @@ class ItemManagementController extends GetxController {
     frekuensiPembaruanController.clear();
     hariPerkiraanHabisController.clear();
     fluktuasiPemakaianController.clear();
+    hargaController.clear();
   }
 
   // Load data ke form untuk edit
@@ -124,6 +128,20 @@ class ItemManagementController extends GetxController {
     frekuensiPembaruanController.text = (item['frekuensiPembaruan'] ?? 0).toString();
     hariPerkiraanHabisController.text = (item['hariPerkiraanHabis'] ?? 0).toString();
     fluktuasiPemakaianController.text = (item['fluktuasiPemakaian'] ?? 0).toString();
+    // Harga nullable - jika null, biarkan kosong
+    final harga = item['harga'];
+    hargaController.text = harga != null ? harga.toString() : '';
+  }
+
+  // Format angka ke Rupiah
+  String formatRupiah(int? value) {
+    if (value == null) return '-';
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 0,
+    );
+    return formatter.format(value);
   }
 
   // Save item (Create or Update)
@@ -147,6 +165,15 @@ class ItemManagementController extends GetxController {
         'fluktuasiPemakaian': double.parse(fluktuasiPemakaianController.text),
         'updatedAt': DateTime.now(),
       };
+
+      // Harga nullable - hanya simpan jika ada isi
+      final hargaText = hargaController.text.trim();
+      if (hargaText.isNotEmpty) {
+        final harga = int.tryParse(hargaText);
+        if (harga != null) {
+          itemData['harga'] = harga;
+        }
+      }
 
       if (editingItemId == null) {
         // Create new item
